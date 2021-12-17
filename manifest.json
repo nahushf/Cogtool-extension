@@ -1,28 +1,40 @@
 {
-	"name": "Events Logger",
-	"manifest_version": 2,
-	"version": "1.0",
-	"background": {
-		"scripts": ["js/background.js"]
-	},
-	"icons": {
-		"32": "icons/icon_32.png"
-	},
-	"browser_action": {
-		"default_popup": "popup.html"
-	},
-	"content_scripts": [
-		{
-			"matches": ["<all_urls>"],
-			"js": ["js/content_script.js"],
-			"match_about_blank": true,
-			"all_frames": true
-		}
-	],
-	"permissions": [
-		"<all_urls>",
-		"downloads",
-		"storage",
-		"unlimitedStorage"
-	]
+    "name": "Events Logger",
+    "manifest_version": 2,
+    "version": "1.0",
+    "background": {
+        "page": "background.html"
+    },
+    "icons": {
+        "32": "icons/icon_32.png"
+    },
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["js/contentScriptEntry.js"],
+            "match_about_blank": true,
+            "all_frames": true,
+            "exclude_matches": [
+                "https://www.figma.com/proto/*"
+            ]
+        },
+        {
+            "matches":[ "https://www.figma.com/proto/*"],
+            "js": ["js/figma_content.js"],
+            "match_about_blank": true,
+            "all_frames": true
+        }
+    ],
+    "web_accessible_resources": [
+        "js/*"
+    ],
+    "permissions": [
+        "<all_urls>",
+        "downloads",
+        "storage",
+        "unlimitedStorage"
+    ]
 }

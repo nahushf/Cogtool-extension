@@ -3,15 +3,21 @@
     <head>
         <link rel="stylesheet" href="css/popup.css">
         <script src="js/renderjson.js" ></script>
-        <script src="js/popup.js"></script>
+        <script type="module" src="js/popup.js"></script>
     </head>
     <body>
-<!-- <textarea id="logArea" readonly></textarea> -->
-        <div id="logs"></div>
-        <div class="btn-row">
-            <button class="export-csv">Save to a CSV file</button>
-            <button class="copy-clipboard">Copy to the clip board</button>
-            <button class="clear-board">Clear logs</button>
-        </div>
+        <!-- <textarea id="logArea" readonly></textarea> -->
+        <div class="control-panel">
+            <input id="think-time-checkbox" class="checkbox" type="checkbox"  >
+            <label class="label" for="think-time-checkbox" >Include Think Time</div>
+        </div>        
+            <div id="logs"></div>
+            <div class="btn-row">
+                <button class="export-csv">Save to a CSV file</button>
+                <button class="copy-clipboard">Copy to the clip board</button>
+                <button class="clear-board">Clear logs</button>
+                <input id="recording-checkbox" type="checkbox"/>
+                <label id="recording-button" class="record" for="recording-checkbox" > <div class="record-icon"></div></label>
+            </div>
     </body>
 </html>

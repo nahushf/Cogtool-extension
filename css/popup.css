@@ -52,14 +52,69 @@ textarea {
     padding: 8px;
 }
 
+#recording-checkbox {
+    display: none;
+}
+
+#recording-checkbox:checked + label .record-icon{
+    border-radius: 0px;
+    border: 0px;
+    box-shadow: none;
+    background: white;
+}
+
+
+#recording-checkbox + label::after{
+    content: "Record";
+    font-weight: bold;
+    color: white;
+}
+
+
+#recording-checkbox:checked + label::after{
+    content: "Stop Recording";
+}
+
+#recording-button {
+    background-color: #D2042D;
+    font-weight: bold;
+}
+
+#recording-button:hover {
+    background-color: #af0225;
+}
+
+#recording-button:active {
+    background-color: #D2042D;
+}
+
+#recording-button .record-icon {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(var(--ggs,1));
+    width: 12px;
+    height: 12px;
+    border: 3px solid transparent;
+    box-shadow: 0 0 0 2px,inset 0 0 0 10px;
+    border-radius: 100px;
+    margin-right: 8px;
+}
+
 button {
     background-color: Silver;
+}
+
+button, #recording-button {
     border: none;
     color: white;
     padding: 6px 2px;
     border-radius: 5px;
     cursor: pointer;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 button:hover {
@@ -74,4 +129,15 @@ button:disabled {
 
 button:active {
     background-color: Silver;
+}
+
+.control-panel {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.control-panel #think-time-checkbox {
+    margin-right: 8px;
 }
