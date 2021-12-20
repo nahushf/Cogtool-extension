@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     const recordKeyVal = recordKey(tabKey);
     const thinkTimeKeyVal = thinkTimeKey(tabKey);
-    chrome.storage.local.get({ [tabKey]: {}, [recordKeyVal]: false, [thinkTimeKeyVal]: false }, data => {
+    chrome.storage.local.get({ [tabKey]: [], [recordKeyVal]: false, [thinkTimeKeyVal]: false }, data => {
         const recordingFlag = data[recordKeyVal];
         const thinkTimeFlag = data[thinkTimeKeyVal];
         if (!recordingFlag) {
@@ -20,6 +20,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (thinkTimeFlag) {
             records.push({ eventType: 'think' });
         }
+        const { eventType, time, nodeName, type } = request.data;
+        chrome.notifications.create(eventType + time, {
+            type: 'basic',
+            title: 'Event Logged',
+            iconUrl: 'icons/icon_32.png',
+            message: `${eventType} event on a <${type}> with text "${nodeName}"`
+        });
         records.push(request.data);
         chrome.storage.local.set({ [tabKey]: records });
     });
