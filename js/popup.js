@@ -38,6 +38,12 @@ class Renderer {
                 this.container.innerHTML += this.renderRecord(record);
             });
         });
+        chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
+        this.getRecordingFlag(isRecording => {
+            if (isRecording) {
+                this.setRecBadge(isRecording);
+            }
+        });
     }
 
     getThinkTimeFlag(callback) {
@@ -50,7 +56,6 @@ class Renderer {
     getRecordingFlag(callback) {
         this.storage.get(recordKey(this.tabKey), data => {
             const recordingFlag = data[recordKey(this.tabKey)];
-            console.log(data);
             callback(recordingFlag);
         });
     }
@@ -94,7 +99,7 @@ class Renderer {
     getCSV(callback) {
         this._getRecords(tabData => {
             if (!tabData.length) {
-                return '';
+                callback('');
             } else {
                 const csv = tabData
                     .map(record => {
@@ -107,6 +112,10 @@ class Renderer {
             }
         });
     }
+
+    setRecBadge(isRecording) {
+        chrome.browserAction.setBadgeText({ tabId: Number(this.tabKey), text: isRecording ? 'rec' : null });
+    }
 }
 
 chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
@@ -116,7 +125,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     const renderer = new Renderer(logsContainer, chrome.storage.local, tabKey);
     renderjson.set_icons('+', '-');
     renderer.setup();
-    chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
 
     const clearBtn = document.querySelector('.clear-board');
     const thinkTimeCheckbox = document.querySelector('#think-time-checkbox');
@@ -125,34 +133,20 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     clearBtn.onclick = () => {
         renderer.clear();
     };
-    // chrome.storage.local.get({ [key]: [] }, data => {
-    // let records = data[key];
     let exportBtn = document.querySelector('.export-csv');
     let copyBtn = document.querySelector('.copy-clipboard');
-    // const clearBtn = document.querySelector('.clear-board');
-    // let textArea = document.querySelector('#logArea');
-
-    // const renderer = new Renderer(textArea);
-    // function resetBoard() {
-    // textArea.value = TEXT_AREA_HEADER;
-    // chrome.storage.local.set({ [key]: [] });
-    // }
-
-    // if (!records.length) return disable('No events were captured.');
-    // received = true;
-    // resetBoard();
-    // records.forEach(record => {
-    // renderer.renderRecord(record);
-    // });
-    // textArea.value += records
-    // .map(
-    // i =>
-    // `Clicked on a <${i.type}> with text "${i.nodeName}": ${i.ms},${i.x},${i.y},${i.width},${i.height},${i.date},${i.time}`
-    // )
-    // .join('\n');
 
     exportBtn.onclick = e => {
         renderer.getCSV(csv => {
+            if(!csv) {
+                chrome.notifications.create('noCSV' + new Date().getTime(), {
+                    type: 'basic',
+                    title: 'No actions recorded',
+                    iconUrl: 'icons/icon_32.png',
+                    message: `Cannot download csv because no actions were recorded`
+                });
+                return
+            }
             let csvContent = 'data:text/csv;charset=utf-8,' + renderer.header + '\n';
             csvContent += csv;
             chrome.downloads.download({
@@ -178,7 +172,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
     recordingCheckbox.addEventListener('change', ({ target: { checked } }) => {
         chrome.storage.local.set({ [recordKey(tabKey)]: checked });
-        chrome.browserAction.setBadgeText({ tabId: Number(tabKey), text: checked ? 'rec' : null });
+        renderer.setRecBadge(checked);
     });
 
     renderer.getThinkTimeFlag(checked => (thinkTimeCheckbox.checked = checked));
@@ -187,16 +181,4 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         recordingCheckbox.checked = recording;
     });
 
-    // clearBtn.onclick = e => {
-    // resetBoard();
-    // };
-
-    // function disable(msg) {
-    // exportBtn.disabled = true;
-    // copyBtn.disabled = true;
-    // textArea.disabled = true;
-    // clearBtn.disabled = true;
-    // textArea.value = msg;
-    // }
-    // });
 });

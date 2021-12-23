@@ -7,6 +7,7 @@ export function main() {
      * is fired after the popup is closed which leads to width, height, x, y as 0
      */
 
+    chrome.runtime.sendMessage({ startup: true });
     document.addEventListener('mousedown', e => {
         // console.log(chrome.tabs.query({ active: true, currentWindow: true }));
         let { target } = e;
@@ -32,7 +33,7 @@ export function main() {
                 y: `${Math.round(y)}`,
                 width: `${Math.round(width)}`,
                 height: `${Math.round(height)}`,
-                nodeName: target.textContent,
+                nodeName: target.textContent?.trim(),
                 type: type.toLowerCase(),
                 date,
                 time: time.replace('Z', '')

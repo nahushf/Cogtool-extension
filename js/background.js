@@ -1,13 +1,27 @@
 import { thinkTimeKey, recordKey } from './utils.js';
 chrome.runtime.onStartup.addListener(() => chrome.storage.local.clear());
 
-chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-    chrome.storage.local.remove(`${tabId}`);
+chrome.tabs.onRemoved.addListener(tabId => {
+    chrome.storage.local.remove(tabId);
+    chrome.storage.local.remove(thinkTimeKey(tabId));
+    chrome.storage.local.remove(recordKey(tabId));
 });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender) => {
     const tabKey = `${sender.tab.id}`;
-
+    if (request.startup) {
+        chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+            if (!tabs?.length) {
+                return;
+            }
+            const tabKey = `${tabs[0].id}`;
+            chrome.storage.local.get(recordKey(tabKey), data => {
+                const recordingFlag = data[recordKey(tabKey)];
+                chrome.browserAction.setBadgeText({ tabId: Number(tabKey), text: recordingFlag ? 'rec' : null });
+            });
+        });
+        return;
+    }
     const recordKeyVal = recordKey(tabKey);
     const thinkTimeKeyVal = thinkTimeKey(tabKey);
     chrome.storage.local.get({ [tabKey]: [], [recordKeyVal]: false, [thinkTimeKeyVal]: false }, data => {
