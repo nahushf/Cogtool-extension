@@ -20,12 +20,6 @@
             "exclude_matches": [
                 "https://www.figma.com/proto/*"
             ]
-        },
-        {
-            "matches":[ "https://www.figma.com/proto/*"],
-            "js": ["js/figma_content.js"],
-            "match_about_blank": true,
-            "all_frames": true
         }
     ],
     "web_accessible_resources": [
