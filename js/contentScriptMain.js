@@ -1,3 +1,4 @@
+import { EVENT_TYPES } from './constants.js';
 const elementsList = ['BUTTON', 'A', 'SELECT', 'INPUT', 'TEXTAREA', 'DETAILS'];
 
 export function main() {
@@ -14,7 +15,7 @@ export function main() {
 
         let interactive;
 
-        if (elementsList.includes(target.nodeName)) interactive = target;
+        if (elementsList.includes(target.nodeText)) interactive = target;
         else {
             interactive = target.closest(elementsList.join(','));
             if (!interactive) return;
@@ -27,13 +28,13 @@ export function main() {
 
         chrome.runtime.sendMessage({
             data: {
-                eventType: 'click',
+                eventType: EVENT_TYPES.CLICK,
                 ms,
                 x: `${Math.round(x)}`,
                 y: `${Math.round(y)}`,
                 width: `${Math.round(width)}`,
                 height: `${Math.round(height)}`,
-                nodeName: target.textContent?.trim(),
+                nodeText: target.textContent?.trim(),
                 type: type.toLowerCase(),
                 date,
                 time: time.replace('Z', '')
@@ -53,7 +54,7 @@ export function main() {
         let [date, time] = new Date().toISOString().split('T');
         chrome.runtime.sendMessage({
             data: {
-                eventType: 'keystroke',
+                eventType: EVENT_TYPES.KEYSTROKE,
                 ms: Date.now(),
                 keycode: key,
                 keyChar,

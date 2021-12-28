@@ -1,3 +1,4 @@
+import { EVENT_TYPES } from './constants.js';
 import { thinkTimeKey, recordKey } from './utils.js';
 chrome.runtime.onStartup.addListener(() => chrome.storage.local.clear());
 
@@ -32,14 +33,14 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
         }
         let records = data[tabKey];
         if (thinkTimeFlag) {
-            records.push({ eventType: 'think' });
+            records.push({ eventType: EVENT_TYPES.THINK });
         }
-        const { eventType, time, nodeName, type } = request.data;
+        const { eventType, time, nodeText, type } = request.data;
         chrome.notifications.create(eventType + time, {
             type: 'basic',
             title: 'Event Logged',
             iconUrl: 'icons/icon_32.png',
-            message: `${eventType} event on a <${type}> with text "${nodeName}"`
+            message: `${eventType} event on a <${type}> with text "${nodeText}"`
         });
         records.push(request.data);
         chrome.storage.local.set({ [tabKey]: records });

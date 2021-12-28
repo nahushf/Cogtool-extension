@@ -1,10 +1,24 @@
+import { marshallRecord } from './Record.js';
 import { thinkTimeKey, recordKey } from './utils.js';
 
 const TEXT_AREA_HEADER = 'Clicked on a <Tag> with "Text": ms,x,y,width,height,date,time\n';
 
+function toggleDrawer(e) {
+    const { target } = e;
+    const node = target.closest('.record-drawer');
+    const isOpen = node.classList.contains('open');
+    if (isOpen) {
+        node.classList.remove('open');
+    } else {
+        node.classList.add('open');
+    }
+}
+
+document.querySelector('#logs').addEventListener('click', toggleDrawer);
+
 class Renderer {
     header;
-    emptyMessage = `<p>No actions recorded</p>`;
+    emptyMessage = `<p class="no-actions">No actions recorded</p>`;
     storage;
     constructor(container, storage, tabKey) {
         this.container = container;
@@ -20,7 +34,8 @@ class Renderer {
                 Object.entries(tabData[0]).map(([key]) => headers.push(key));
                 this.header = headers.join(', ');
             }
-            callback(tabData);
+
+            callback(tabData.map(record => marshallRecord(record)));
         });
     }
 
@@ -34,9 +49,12 @@ class Renderer {
                 this.container.innerHTML = this.emptyMessage;
                 return;
             }
+            let totalTime = 0;
             tabData.forEach(record => {
                 this.container.innerHTML += this.renderRecord(record);
+                totalTime += record.time;
             });
+            document.querySelector('#total-time .total-time__value').innerText = totalTime.toPrecision(4) + 's';
         });
         chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
         this.getRecordingFlag(isRecording => {
@@ -67,18 +85,10 @@ class Renderer {
     }
 
     renderRecord(record) {
-        switch (record.eventType) {
-            case 'keystroke': {
-                return this.renderKeyStrokeRecord(record);
-            }
-            case 'click': {
-                return this.renderClickRecord(record);
-            }
-            case 'think': {
-                return this.renderThinkRecord(record);
-            }
-        }
-        return this[record.eventType === 'keystroke' ? 'renderKeyStrokeRecord' : 'renderClickRecord'](record);
+        return `<div class="record-drawer" >
+            <div class="drawer-toggle" >${record.renderHeader()}${record.renderTime()}</div>
+            <div class="drawer-content">${record.renderJSON()}</div>
+            </div>`;
     }
 
     renderKeyStrokeRecord(record) {
@@ -90,7 +100,7 @@ class Renderer {
     renderClickRecord(record) {
         return `<div class="record-row-container"><span class="record-row-title" >Clicked on a "${
             record.type == 'a' ? 'anchor' : record.type
-        }" with text ${record.nodeName}</span>: ${JSON.stringify(record)}</div>`;
+        }" with text ${record.nodeText}</span>: ${JSON.stringify(record)}</div>`;
     }
 
     renderThinkRecord(record) {
@@ -138,14 +148,14 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
     exportBtn.onclick = e => {
         renderer.getCSV(csv => {
-            if(!csv) {
+            if (!csv) {
                 chrome.notifications.create('noCSV' + new Date().getTime(), {
                     type: 'basic',
                     title: 'No actions recorded',
                     iconUrl: 'icons/icon_32.png',
                     message: `Cannot download csv because no actions were recorded`
                 });
-                return
+                return;
             }
             let csvContent = 'data:text/csv;charset=utf-8,' + renderer.header + '\n';
             csvContent += csv;
@@ -157,13 +167,16 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     };
 
     copyBtn.onclick = e => {
-        renderer.getCSV(csv => {});
-        textArea.focus();
-        textArea.select();
-        document.execCommand('copy');
-        let label = copyBtn.innerText;
-        copyBtn.innerText = 'Copied';
-        setTimeout(() => (copyBtn.innerText = label), 800);
+        renderer.getCSV(csv => {
+            const clipboardAssistTextArea = document.querySelector('#clipboard-assist');
+            clipboardAssistTextArea.value = csv;
+            clipboardAssistTextArea.focus();
+            clipboardAssistTextArea.select();
+            document.execCommand('copy');
+            let label = copyBtn.innerText;
+            copyBtn.innerText = 'Copied';
+            setTimeout(() => (copyBtn.innerText = label), 800);
+        });
     };
 
     thinkTimeCheckbox.addEventListener('change', e => {
@@ -180,5 +193,4 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     renderer.getRecordingFlag(recording => {
         recordingCheckbox.checked = recording;
     });
-
 });

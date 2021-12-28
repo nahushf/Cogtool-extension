@@ -7,11 +7,18 @@
     </head>
     <body>
         <!-- <textarea id="logArea" readonly></textarea> -->
-        <div class="control-panel">
-            <input id="think-time-checkbox" class="checkbox" type="checkbox"  >
-            <label class="label" for="think-time-checkbox" >Include Think Time</div>
-        </div>        
+        <div class="logs-header" >
+            Actions
+            <div class="think-time-checkbox-container">
+                <input id="think-time-checkbox" class="checkbox" type="checkbox"  >
+                <label class="label" for="think-time-checkbox" >Include Think Time</label>
+            </div>        
+        </div>
             <div id="logs"></div>
+            <div id="total-time">
+                <div class="total-time__header">Total time:</div>
+                <div class="total-time__value">0.00s</div>
+            </div>
             <div class="btn-row">
                 <input id="recording-checkbox" type="checkbox"/>
                 <label id="recording-button" class="record" for="recording-checkbox" > <div class="record-icon"></div></label>
@@ -19,5 +26,6 @@
                 <button class="copy-clipboard">Copy to the clipboard</button>
                 <button class="export-csv">Save to a CSV file</button>
             </div>
+            <textarea id="clipboard-assist" ></textarea>
     </body>
 </html>
