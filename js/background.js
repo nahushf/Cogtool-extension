@@ -3,9 +3,9 @@ import { thinkTimeKey, recordKey } from './utils.js';
 chrome.runtime.onStartup.addListener(() => chrome.storage.local.clear());
 
 chrome.tabs.onRemoved.addListener(tabId => {
-    chrome.storage.local.remove(tabId);
-    chrome.storage.local.remove(thinkTimeKey(tabId));
-    chrome.storage.local.remove(recordKey(tabId));
+    chrome.storage.local.remove(tabId, () => {});
+    chrome.storage.local.remove(thinkTimeKey(tabId), () => {});
+    chrome.storage.local.remove(recordKey(tabId), () => {});
 });
 
 chrome.runtime.onMessage.addListener(async (request, sender) => {

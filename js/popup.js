@@ -54,13 +54,6 @@ class Renderer {
                 this.container.innerHTML += this.renderRecord(record);
                 totalTime += record.time;
             });
-            document.querySelector('#total-time .total-time__value').innerText = totalTime.toPrecision(4) + 's';
-        });
-        chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
-        this.getRecordingFlag(isRecording => {
-            if (isRecording) {
-                this.setRecBadge(isRecording);
-            }
         });
     }
 
@@ -91,21 +84,6 @@ class Renderer {
             </div>`;
     }
 
-    renderKeyStrokeRecord(record) {
-        return `<div class="record-row-container keystroke-record"><span class="record-row-title" >Tapped on the ${
-            record.key
-        } key</span>: ${JSON.stringify(record)}</div>`;
-    }
-
-    renderClickRecord(record) {
-        return `<div class="record-row-container"><span class="record-row-title" >Clicked on a "${
-            record.type == 'a' ? 'anchor' : record.type
-        }" with text ${record.nodeText}</span>: ${JSON.stringify(record)}</div>`;
-    }
-
-    renderThinkRecord(record) {
-        return `<div class='record-row-container think-record'><span class="record-row-title">Think</span></div>`;
-    }
     getCSV(callback) {
         this._getRecords(tabData => {
             if (!tabData.length) {
@@ -113,7 +91,7 @@ class Renderer {
             } else {
                 const csv = tabData
                     .map(record => {
-                        return Object.entries(record)
+                        return Object.entries(record.record)
                             .map(tuple => tuple[1])
                             .join(', ');
                     })
