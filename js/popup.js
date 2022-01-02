@@ -19,6 +19,7 @@ class Renderer {
     emptyMessage = `<p class="no-actions">No actions recorded</p>`;
     keyOrder = ['eventType', 'type', 'nodeText', 'x', 'y', 'height', 'width', 'ms', 'date', 'time'];
     storage;
+    totalTimeNode = document.querySelector('#total-time .total-time__value');
     constructor(container, storage, tabKey) {
         this.container = container;
         this.storage = storage;
@@ -37,6 +38,10 @@ class Renderer {
         this.storage.set({ [this.tabKey]: value }, callback);
     }
 
+    setTotalTime(totalTime) {
+        this.totalTimeNode.innerText = totalTime.toPrecision(4) + 's';
+    }
+
     setup() {
         this._getRecords(tabData => {
             if (!tabData.length) {
@@ -48,7 +53,7 @@ class Renderer {
                 this.container.innerHTML += this.renderRecord(record);
                 totalTime += record.time;
             });
-            document.querySelector('#total-time .total-time__value').innerText = totalTime.toPrecision(4) + 's';
+            this.setTotalTime(totalTime)
         });
         chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
         this.getRecordingFlag(isRecording => {
@@ -150,6 +155,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
     clearBtn.onclick = () => {
         renderer.clear();
+        renderer.setTotalTime(0)
     };
     let exportBtn = document.querySelector('.export-csv');
     let copyBtn = document.querySelector('.copy-clipboard');
