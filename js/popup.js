@@ -1,8 +1,6 @@
 import { marshallRecord } from './Record.js';
 import { thinkTimeKey, recordKey } from './utils.js';
 
-const TEXT_AREA_HEADER = 'Clicked on a <Tag> with "Text": ms,x,y,width,height,date,time\n';
-
 function toggleDrawer(e) {
     const { target } = e;
     const node = target.closest('.record-drawer');
@@ -19,22 +17,18 @@ document.querySelector('#logs').addEventListener('click', toggleDrawer);
 class Renderer {
     header;
     emptyMessage = `<p class="no-actions">No actions recorded</p>`;
+    keyOrder = ['eventType', 'type', 'nodeText', 'x', 'y', 'height', 'width', 'ms', 'date', 'time'];
     storage;
     constructor(container, storage, tabKey) {
         this.container = container;
         this.storage = storage;
         this.tabKey = tabKey;
+        this.header = this.keyOrder.join(', ');
     }
 
     _getRecords(callback) {
         return this.storage.get(this.tabKey, data => {
             const tabData = data[this.tabKey] || [];
-            if (tabData.length && !this.header?.length) {
-                const headers = [];
-                Object.entries(tabData[0]).map(([key]) => headers.push(key));
-                this.header = headers.join(', ');
-            }
-
             callback(tabData.map(record => marshallRecord(record)));
         });
     }
@@ -54,7 +48,36 @@ class Renderer {
                 this.container.innerHTML += this.renderRecord(record);
                 totalTime += record.time;
             });
+            document.querySelector('#total-time .total-time__value').innerText = totalTime.toPrecision(4) + 's';
         });
+        chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
+        this.getRecordingFlag(isRecording => {
+            if (isRecording) {
+                this.setRecBadge(isRecording);
+            }
+        });
+        // const capturing = chrome.tabs.captureVisibleTab(void 0, stream => {
+        // this._getRecords(tabData => {
+        // if (!tabData.length) {
+        // this.container.innerHTML = this.emptyMessage;
+        // return;
+        // }
+        // let totalTime = 0;
+        // tabData.forEach(record => {
+        // this.container.innerHTML +=
+        // this.renderRecord(record) +
+        // `<div style="background-size: auto; background-image: url('${stream}'); background-position: -${record.record.x}px -${record.record.y}px; height: ${record.record.height}px; width: ${record.record.width}px"/>`;
+        // totalTime += record.time;
+        // });
+        // document.querySelector('#total-time .total-time__value').innerText = totalTime.toPrecision(4) + 's';
+        // });
+        // chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
+        // this.getRecordingFlag(isRecording => {
+        // if (isRecording) {
+        // this.setRecBadge(isRecording);
+        // }
+        // });
+        // });
     }
 
     getThinkTimeFlag(callback) {
@@ -92,6 +115,13 @@ class Renderer {
                 const csv = tabData
                     .map(record => {
                         return Object.entries(record.record)
+                            .sort((a, b) => {
+                                return this.keyOrder.indexOf(a[0]) < this.keyOrder.indexOf(b[0])
+                                    ? -1
+                                    : this.keyOrder.indexOf(a[0]) > this.keyOrder.indexOf(b[0])
+                                    ? 1
+                                    : 0;
+                            })
                             .map(tuple => tuple[1])
                             .join(', ');
                     })
@@ -147,7 +177,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     copyBtn.onclick = e => {
         renderer.getCSV(csv => {
             const clipboardAssistTextArea = document.querySelector('#clipboard-assist');
-            clipboardAssistTextArea.value = csv;
+            clipboardAssistTextArea.value = renderer.header + '\n' + csv;
             clipboardAssistTextArea.focus();
             clipboardAssistTextArea.select();
             document.execCommand('copy');
