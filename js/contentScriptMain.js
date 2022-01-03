@@ -60,7 +60,7 @@ export function main() {
                 y: '',
                 width: '',
                 height: '',
-                nodeText: e.key + `(${key})`,
+                nodeText: e.key,
                 type: '',
                 date,
                 time: time.replace('Z', '')
