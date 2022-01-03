@@ -56,9 +56,12 @@ export function main() {
             data: {
                 eventType: EVENT_TYPES.KEYSTROKE,
                 ms: Date.now(),
-                keycode: key,
-                keyChar,
-                key: e.key,
+                x: '',
+                y: '',
+                width: '',
+                height: '',
+                nodeText: e.key + `(${key})`,
+                type: '',
                 date,
                 time: time.replace('Z', '')
             }

@@ -53,7 +53,7 @@ class Renderer {
                 this.container.innerHTML += this.renderRecord(record);
                 totalTime += record.time;
             });
-            this.setTotalTime(totalTime)
+            this.setTotalTime(totalTime);
         });
         chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
         this.getRecordingFlag(isRecording => {
@@ -127,8 +127,8 @@ class Renderer {
                                     ? 1
                                     : 0;
                             })
-                            .map(tuple => tuple[1])
-                            .join(', ');
+                            .map(tuple => `"${tuple[1]}"`)
+                            .join(',');
                     })
                     .join('\n');
                 callback(csv);
@@ -155,7 +155,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
     clearBtn.onclick = () => {
         renderer.clear();
-        renderer.setTotalTime(0)
+        renderer.setTotalTime(0);
     };
     let exportBtn = document.querySelector('.export-csv');
     let copyBtn = document.querySelector('.copy-clipboard');

@@ -40,7 +40,7 @@ export class KeystrokeRecord extends Record {
     }
 
     renderHeader() {
-        return `<div>Tapped on ${this.record.key}</div> `;
+        return `<div>Tapped on ${this.record.nodeText}</div> `;
     }
 
 }
