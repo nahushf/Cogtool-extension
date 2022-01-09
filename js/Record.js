@@ -1,4 +1,4 @@
-import { EVENT_TYPES } from './constants.js';
+import { EVENT_TYPES, THINK_TIME } from './constants.js';
 
 export class Record {
     record;
@@ -8,16 +8,20 @@ export class Record {
     }
 
     renderTime() {
-        return `<div class="time">${this.time}s</div> `;
+        return `<div class="time">${this.record.timeTaken / 1000}s</div> `;
     }
 
     renderJSON() {
-        return JSON.stringify(this.record, null, 4).split('\n').join('<br/>').split('    ').join('&nbsp;&nbsp;&nbsp;&nbsp;');
+        return JSON.stringify(this.record, null, 4)
+            .split('\n')
+            .join('<br/>')
+            .split('    ')
+            .join('&nbsp;&nbsp;&nbsp;&nbsp;');
     }
 }
 
 export class ThinkRecord extends Record {
-    time = 1.2;
+    time = THINK_TIME;
 
     constructor(record) {
         super(record);
@@ -42,7 +46,6 @@ export class KeystrokeRecord extends Record {
     renderHeader() {
         return `<div>Tapped on ${this.record.nodeText}</div> `;
     }
-
 }
 
 export class ClickRecord extends Record {
@@ -56,7 +59,6 @@ export class ClickRecord extends Record {
         const { type, nodeText } = this.record;
         return `<div>Clicked: ${type == 'a' ? 'anchor' : type} with text "${nodeText}"</div>`;
     }
-
 }
 
 export function marshallRecord(record) {

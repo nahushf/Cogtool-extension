@@ -1,5 +1,5 @@
 import { marshallRecord } from './Record.js';
-import { thinkTimeKey, recordKey } from './utils.js';
+import { getState, setRecordState, thinkTimeKey } from './utils.js';
 
 function toggleDrawer(e) {
     const { target } = e;
@@ -19,7 +19,10 @@ class Renderer {
     emptyMessage = `<p class="no-actions">No actions recorded</p>`;
     keyOrder = ['eventType', 'type', 'nodeText', 'x', 'y', 'height', 'width', 'ms', 'date', 'time'];
     storage;
+    recordStartTimestamp;
     totalTimeNode = document.querySelector('#total-time .total-time__value');
+    recordingCheckboxNode = document.querySelector('#recording-checkbox');
+
     constructor(container, storage, tabKey) {
         this.container = container;
         this.storage = storage;
@@ -43,45 +46,46 @@ class Renderer {
     }
 
     setup() {
-        this._getRecords(tabData => {
-            if (!tabData.length) {
-                this.container.innerHTML = this.emptyMessage;
-                return;
-            }
-            let totalTime = 0;
-            tabData.forEach(record => {
-                this.container.innerHTML += this.renderRecord(record);
-                totalTime += record.time;
-            });
-            this.setTotalTime(totalTime);
-        });
         chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
-        this.getRecordingFlag(isRecording => {
-            if (isRecording) {
-                this.setRecBadge(isRecording);
+        getState({
+            tabKey: this.tabKey,
+            callback: ({ records, thinkTimeFlag, recordState }) => {
+                if (!records.length) {
+                    this.container.innerHTML = this.emptyMessage;
+                    return;
+                }
+                let totalTime = 0;
+                records.forEach((record, index) => {
+                    this.container.innerHTML += this.renderRecord(record);
+                    totalTime += record.timeTaken;
+                });
+                this.setTotalTime(totalTime / 1000);
+
+                const isRecording = recordState.recording;
+                if (isRecording) {
+                    this.setRecBadge(isRecording);
+                    this.recordingCheckboxNode.checked = true;
+                }
             }
         });
-        // const capturing = chrome.tabs.captureVisibleTab(void 0, stream => {
         // this._getRecords(tabData => {
         // if (!tabData.length) {
         // this.container.innerHTML = this.emptyMessage;
         // return;
         // }
         // let totalTime = 0;
-        // tabData.forEach(record => {
-        // this.container.innerHTML +=
-        // this.renderRecord(record) +
-        // `<div style="background-size: auto; background-image: url('${stream}'); background-position: -${record.record.x}px -${record.record.y}px; height: ${record.record.height}px; width: ${record.record.width}px"/>`;
+        // tabData.forEach((record, index) => {
+        // const previosRecord = tabData[index - 1];
+        // this.container.innerHTML += this.renderRecord(record);
         // totalTime += record.time;
         // });
-        // document.querySelector('#total-time .total-time__value').innerText = totalTime.toPrecision(4) + 's';
+        // this.setTotalTime(totalTime);
         // });
         // chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
-        // this.getRecordingFlag(isRecording => {
+        // this.getRecordingFlag(({ recording: isRecording }) => {
         // if (isRecording) {
         // this.setRecBadge(isRecording);
         // }
-        // });
         // });
     }
 
@@ -93,9 +97,11 @@ class Renderer {
     }
 
     getRecordingFlag(callback) {
-        this.storage.get(recordKey(this.tabKey), data => {
-            const recordingFlag = data[recordKey(this.tabKey)];
-            callback(recordingFlag);
+        getState({
+            tabKey: this.tabKey,
+            callback({ recordState: { recording } }) {
+                callback(recording);
+            }
         });
     }
 
@@ -106,9 +112,10 @@ class Renderer {
     }
 
     renderRecord(record) {
+        const recordInstance = marshallRecord(record);
         return `<div class="record-drawer" >
-            <div class="drawer-toggle" >${record.renderHeader()}${record.renderTime()}</div>
-            <div class="drawer-content">${record.renderJSON()}</div>
+            <div class="drawer-toggle" >${recordInstance.renderHeader()}${recordInstance.renderTime()}</div>
+            <div class="drawer-content">${recordInstance.renderJSON()}</div>
             </div>`;
     }
 
@@ -151,7 +158,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
     const clearBtn = document.querySelector('.clear-board');
     const thinkTimeCheckbox = document.querySelector('#think-time-checkbox');
-    const recordingCheckbox = document.querySelector('#recording-checkbox');
+    const recordingCheckbox = renderer.recordingCheckboxNode;
 
     clearBtn.onclick = () => {
         renderer.clear();
@@ -198,13 +205,18 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     });
 
     recordingCheckbox.addEventListener('change', ({ target: { checked } }) => {
-        chrome.storage.local.set({ [recordKey(tabKey)]: checked });
+        setRecordState({
+            tabKey,
+            storage: chrome.storage.local,
+            recording: checked,
+            timestamp: checked ? Date.now() : null
+        });
         renderer.setRecBadge(checked);
     });
 
     renderer.getThinkTimeFlag(checked => (thinkTimeCheckbox.checked = checked));
 
-    renderer.getRecordingFlag(recording => {
-        recordingCheckbox.checked = recording;
+    renderer.getRecordingFlag(recordingFlag => {
+        recordingCheckbox.checked = recordingFlag;
     });
 });

@@ -1,5 +1,5 @@
-import { EVENT_TYPES } from './constants.js';
-import { thinkTimeKey, recordKey } from './utils.js';
+import { EVENT_TYPES, THINK_TIME } from './constants.js';
+import { recordKey, thinkTimeKey, getState } from './utils.js';
 chrome.runtime.onStartup.addListener(() => chrome.storage.local.clear());
 
 chrome.tabs.onRemoved.addListener(tabId => {
@@ -8,41 +8,55 @@ chrome.tabs.onRemoved.addListener(tabId => {
     chrome.storage.local.remove(recordKey(tabId), () => {});
 });
 
-chrome.runtime.onMessage.addListener(async (request, sender) => {
-    const tabKey = `${sender.tab.id}`;
-    if (request.startup) {
-        chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-            if (!tabs?.length) {
-                return;
-            }
-            const tabKey = `${tabs[0].id}`;
-            chrome.storage.local.get(recordKey(tabKey), data => {
-                const recordingFlag = data[recordKey(tabKey)];
-                chrome.browserAction.setBadgeText({ tabId: Number(tabKey), text: recordingFlag ? 'rec' : null });
-            });
-        });
-        return;
-    }
-    const recordKeyVal = recordKey(tabKey);
-    const thinkTimeKeyVal = thinkTimeKey(tabKey);
-    chrome.storage.local.get({ [tabKey]: [], [recordKeyVal]: false, [thinkTimeKeyVal]: false }, data => {
-        const recordingFlag = data[recordKeyVal];
-        const thinkTimeFlag = data[thinkTimeKeyVal];
-        if (!recordingFlag) {
+function setBadge() {
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        if (!tabs?.length) {
             return;
         }
-        let records = data[tabKey];
-        if (thinkTimeFlag) {
-            records.push({ eventType: EVENT_TYPES.THINK });
-        }
-        const { eventType, time, nodeText, type } = request.data;
-        chrome.notifications.create(eventType + time, {
-            type: 'basic',
-            title: 'Event Logged',
-            iconUrl: 'icons/icon_32.png',
-            message: `${eventType} event on a <${type}> with text "${nodeText}"`
+        const tabKey = `${tabs[0].id}`;
+        getState({
+            tabKey,
+            callback({ recordState: { recording: recordingFlag } }) {
+                chrome.browserAction.setBadgeText({
+                    tabId: Number(tabKey),
+                    text: recordingFlag ? 'rec' : null
+                });
+            }
         });
-        records.push(request.data);
-        chrome.storage.local.set({ [tabKey]: records });
+    });
+}
+
+chrome.runtime.onMessage.addListener(async (request, sender) => {
+    const tabKey = `${sender.tab.id}`;
+    getState({
+        tabKey,
+        callback: ({ recordState, thinkTimeFlag, records }) => {
+            if (request.startup) {
+                setBadge();
+                return;
+            }
+            const recordingFlag = recordState.recording;
+            if (!recordingFlag) {
+                return;
+            }
+            if (thinkTimeFlag) {
+                records.push({ eventType: EVENT_TYPES.THINK, timeTaken: THINK_TIME });
+            }
+            const { eventType, time, nodeText, type } = request.data;
+            const lastRecord = records[records.length - 1];
+            const timeTaken = request.data.ms - (lastRecord?.ms || recordState.timestamp);
+
+            chrome.notifications.create(eventType + time, {
+                type: 'basic',
+                title: 'Event Logged',
+                iconUrl: 'icons/icon_32.png',
+                message: `${eventType} event on a <${type}> with text "${nodeText}"`
+            });
+            records.push({
+                ...request.data,
+                timeTaken
+            });
+            chrome.storage.local.set({ [tabKey]: records });
+        }
     });
 });
