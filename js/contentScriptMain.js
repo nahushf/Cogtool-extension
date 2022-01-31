@@ -2,7 +2,6 @@ import { EVENT_TYPES } from './constants.js';
 const elementsList = ['BUTTON', 'A', 'SELECT', 'INPUT', 'TEXTAREA', 'DETAILS'];
 
 export function main() {
-    // Do what you want
     /**
      * Using the mousedown event instead of the click event because in case of popups, the click event
      * is fired after the popup is closed which leads to width, height, x, y as 0
@@ -34,6 +33,8 @@ export function main() {
                 y: `${Math.round(y)}`,
                 width: `${Math.round(width)}`,
                 height: `${Math.round(height)}`,
+                centerX: x + width / 2,
+                centerY: y + height / 2,
                 nodeText: target.textContent?.trim(),
                 type: type.toLowerCase(),
                 date,
@@ -43,6 +44,23 @@ export function main() {
     });
 
     const KEYSTROKE_TAGS = ['INPUT', 'TEXTAREA'];
+
+    // Code to test/view clicks and distances
+    // window.w = ({ x, y, angle }) => {
+    // const span = document.createElement('span');
+    // span.className = 'abc';
+    // span.style = `position: fixed; top: ${e.y}px; left: ${e.x}px;
+    // height: 5px;
+    // width: 5px;
+    // border-top: 2px solid red;
+    // border-radius: 10px;
+    // transform: translate(-50%, -50%) rotate(90deg);
+
+    // `;
+    // document.body.appendChild(span);
+    // };
+
+    // document.addEventListener('click', e => {});
 
     document.addEventListener('keyup', e => {
         if (!KEYSTROKE_TAGS.includes(document.activeElement.tagName)) {
