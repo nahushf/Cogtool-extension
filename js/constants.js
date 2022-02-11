@@ -12,6 +12,6 @@ export const RECORDING_OFF_STATE = {
 };
 
 export const FITTS_CONSTANT = {
-    A: 1,
-    B: 2
+    A: 595.8773979024193,
+    B: 144.3519845199607
 };
