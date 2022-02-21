@@ -3,10 +3,12 @@ import { getState, recordKey, thinkTimeKey, calculateExpertTime, distanceBetween
 chrome.runtime.onStartup.addListener(() => chrome.storage.local.clear());
 
 chrome.tabs.onRemoved.addListener(tabId => {
-    getState({
-        tabId,
-        callback: (...args) => {
-            chrome.storage.local.remove([tabId, thinkTimeKey(tabId), recordKey(tabId)], () => {});
+    chrome.storage.local.get(data => {
+        const keys = [tabId, thinkTimeKey(tabId), recordKey(tabId)];
+        for (let key of keys) {
+            if (data.hasOwnProperty(key)) {
+                chrome.storage.local.remove(key);
+            }
         }
     });
 });
