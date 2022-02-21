@@ -41,10 +41,12 @@ export class ThinkRecord extends Record {
 }
 
 export class KeystrokeRecord extends Record {
-    time = 0.28;
-
     constructor(record) {
         super(record);
+        /**
+         * Keystroke expert time is calculated as K + P from http://facweb.cs.depaul.edu/cmiller/eval/goms.html
+         */
+        this.record = { ...this.record, expertTime: 0.2 + 1.1 };
     }
 
     renderHeader() {

@@ -22,7 +22,7 @@ class Renderer {
     recordStartTimestamp;
     totalTimeNode = document.querySelector('#total-time .total-time__value');
     recordingCheckboxNode = document.querySelector('#recording-checkbox');
-
+    clearBtn = document.querySelector('.clear-board');
     constructor(container, storage, tabKey) {
         this.container = container;
         this.storage = storage;
@@ -61,11 +61,6 @@ class Renderer {
                 });
                 this.setTotalTime(totalTime / 1000);
 
-                const isRecording = recordState.recording;
-                if (isRecording) {
-                    this.setRecBadge(isRecording);
-                    this.recordingCheckboxNode.checked = true;
-                }
             }
         });
         // this._getRecords(tabData => {
@@ -156,7 +151,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     renderjson.set_icons('+', '-');
     renderer.setup();
 
-    const clearBtn = document.querySelector('.clear-board');
+    const clearBtn = renderer.clearBtn;
     const thinkTimeCheckbox = document.querySelector('#think-time-checkbox');
     const recordingCheckbox = renderer.recordingCheckboxNode;
 
@@ -212,11 +207,13 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
             timestamp: checked ? Date.now() : null
         });
         renderer.setRecBadge(checked);
+        clearBtn.disabled = checked;
     });
 
     renderer.getThinkTimeFlag(checked => (thinkTimeCheckbox.checked = checked));
 
     renderer.getRecordingFlag(recordingFlag => {
         recordingCheckbox.checked = recordingFlag;
+        clearBtn.disabled = recordingFlag;
     });
 });

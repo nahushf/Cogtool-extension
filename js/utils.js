@@ -95,3 +95,7 @@ export function lineIntersectionOnRect({ width, height, xB, yB, xA, yA }) {
 export function calculateExpertTime({ targetSize, distance }) {
     return FITTS_CONSTANT.A + FITTS_CONSTANT.B * Math.log2(distance / targetSize + 1);
 }
+
+export function distanceBetweenCoordinates({ x1, y1, x2, y2 }) {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
