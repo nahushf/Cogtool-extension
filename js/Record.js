@@ -55,8 +55,6 @@ export class KeystrokeRecord extends Record {
 }
 
 export class ClickRecord extends Record {
-    time = 1.1;
-
     constructor(record) {
         super(record);
     }
@@ -78,5 +76,19 @@ export function marshallRecord(record) {
         case EVENT_TYPES.THINK: {
             return new ThinkRecord(record);
         }
+        case EVENT_TYPES.SCROLL: {
+            return new ScrollRecord(record);
+        }
+    }
+}
+
+export class ScrollRecord extends Record {
+    constructor(record) {
+        super(record);
+    }
+
+    renderHeader() {
+        console.log(this.record);
+        return `<div>Scrolled ${this.record.type} tag with class(es) "${this.record.classList[0]}"</div>`;
     }
 }

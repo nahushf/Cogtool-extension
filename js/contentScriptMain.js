@@ -8,6 +8,46 @@ export function main() {
      */
 
     chrome.runtime.sendMessage({ startup: true });
+    let mouseWheelTimer;
+    let mouseWheelEventLog = {};
+    document.addEventListener('mousewheel', event => {
+        if (!mouseWheelEventLog.length) {
+            mouseWheelEventLog[Date.now()] = event;
+        }
+        clearTimeout(mouseWheelTimer);
+        mouseWheelTimer = setTimeout(() => {
+            const path = event.path || event.composedPath();
+            const scrolledNode = path.find(
+                node => node.scrollHeight > node.clientHeight || node.scrollWidth > node.clientWidth
+            );
+            const { x, y, width, height } = scrolledNode.getBoundingClientRect();
+            const type = scrolledNode.nodeName;
+            const startTime = Object.keys(mouseWheelEventLog);
+            const date = new Date();
+            const ms = date.getTime();
+            chrome.runtime.sendMessage({
+                data: {
+                    eventType: EVENT_TYPES.SCROLL,
+                    scrollTime: ms - startTime,
+                    classList: scrolledNode.className.split(' '),
+                    ms,
+                    x: `${Math.round(x)}`,
+                    y: `${Math.round(y)}`,
+                    width: `${Math.round(width)}`,
+                    height: `${Math.round(height)}`,
+                    centerX: x + width / 2,
+                    centerY: y + height / 2,
+                    date,
+                    type,
+                    time: date
+                        .toISOString()
+                        .split('T')[1]
+                        .replace('Z', '')
+                }
+            });
+            mouseWheelEventLog = {};
+        }, 100);
+    });
     document.addEventListener('mousedown', e => {
         // console.log(chrome.tabs.query({ active: true, currentWindow: true }));
         let { target } = e;

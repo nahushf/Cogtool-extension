@@ -55,7 +55,7 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
                 type: 'basic',
                 title: 'Event Logged',
                 iconUrl: 'icons/icon_32.png',
-                message: `${eventType} event on a <${type}> with text "${nodeText}"`
+                message: `${eventType} event on a <${type}> tag ${nodeText ? ` with text "${nodeText}"` : ''}`
             });
             chrome.storage.local.set({ [tabKey]: records });
         }
