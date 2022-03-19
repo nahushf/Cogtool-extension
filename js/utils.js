@@ -99,3 +99,39 @@ export function calculateExpertTime({ targetSize, distance }) {
 export function distanceBetweenCoordinates({ x1, y1, x2, y2 }) {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
+
+export function sendEventMessage({
+    eventType,
+    scrollTime,
+    classList,
+    ms,
+    x,
+    y,
+    width,
+    height,
+    centerX,
+    centerY,
+    date,
+    type,
+    time,
+    ...remainingData
+}) {
+    chrome.runtime.sendMessage({
+        data: {
+            eventType,
+            scrollTime,
+            classList,
+            ms,
+            x,
+            y,
+            width,
+            height,
+            centerX,
+            centerY,
+            date,
+            type,
+            time,
+            ...remainingData
+        }
+    });
+}

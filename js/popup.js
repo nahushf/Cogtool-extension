@@ -60,28 +60,8 @@ class Renderer {
                     totalTime += record.timeTaken;
                 });
                 this.setTotalTime(totalTime / 1000);
-
             }
         });
-        // this._getRecords(tabData => {
-        // if (!tabData.length) {
-        // this.container.innerHTML = this.emptyMessage;
-        // return;
-        // }
-        // let totalTime = 0;
-        // tabData.forEach((record, index) => {
-        // const previosRecord = tabData[index - 1];
-        // this.container.innerHTML += this.renderRecord(record);
-        // totalTime += record.time;
-        // });
-        // this.setTotalTime(totalTime);
-        // });
-        // chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
-        // this.getRecordingFlag(({ recording: isRecording }) => {
-        // if (isRecording) {
-        // this.setRecBadge(isRecording);
-        // }
-        // });
     }
 
     getThinkTimeFlag(callback) {
@@ -119,21 +99,38 @@ class Renderer {
             if (!tabData.length) {
                 callback('');
             } else {
-                const csv = tabData
-                    .map(record => {
-                        return Object.entries(record.record)
-                            .sort((a, b) => {
-                                return this.keyOrder.indexOf(a[0]) < this.keyOrder.indexOf(b[0])
-                                    ? -1
-                                    : this.keyOrder.indexOf(a[0]) > this.keyOrder.indexOf(b[0])
-                                    ? 1
-                                    : 0;
-                            })
-                            .map(tuple => `"${tuple[1]}"`)
-                            .join(',');
-                    })
-                    .join('\n');
-                callback(csv);
+                const tuples = [];
+
+                tabData.forEach(({ record }) => {
+                    const missingKeys = Object.keys(record).filter(key => {
+                        return !this.keyOrder.includes(key);
+                    });
+                    this.keyOrder = [...this.keyOrder, ...missingKeys];
+                });
+                tabData.forEach(({ record }) => {
+                    tuples.push(this.keyOrder.map(key => record[key]).join(','));
+                });
+                // const csv = tabData
+                // .map(record => {
+                // return Object.entries(record.record)
+                // .map(entry => {
+                // if (this.keyOrder.indexOf(entry[0] < 0)) {
+                // this.keyOrder.push(entry[0]);
+                // }
+                // return entry;
+                // })
+                // .sort((a, b) => {
+                // return this.keyOrder.indexOf(a[0]) < this.keyOrder.indexOf(b[0])
+                // ? -1
+                // : this.keyOrder.indexOf(a[0]) > this.keyOrder.indexOf(b[0])
+                // ? 1
+                // : 0;
+                // })
+                // .map(tuple => `"${tuple[1]}"`)
+                // .join(',');
+                // })
+                // .join('\n');
+                callback(this.keyOrder, tuples.join('\n'));
             }
         });
     }
@@ -163,7 +160,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     let copyBtn = document.querySelector('.copy-clipboard');
 
     exportBtn.onclick = e => {
-        renderer.getCSV(csv => {
+        renderer.getCSV(( keyOrder, csv ) => {
             if (!csv) {
                 chrome.notifications.create('noCSV' + new Date().getTime(), {
                     type: 'basic',
@@ -173,7 +170,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
                 });
                 return;
             }
-            let csvContent = 'data:text/csv;charset=utf-8,' + renderer.header + '\n';
+            let csvContent = 'data:text/csv;charset=utf-8,' + keyOrder + '\n';
             csvContent += csv;
             chrome.downloads.download({
                 url: encodeURI(csvContent),

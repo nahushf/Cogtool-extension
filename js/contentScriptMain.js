@@ -1,4 +1,5 @@
 import { EVENT_TYPES } from './constants.js';
+import { sendEventMessage } from './utils.js';
 const elementsList = ['BUTTON', 'A', 'SELECT', 'INPUT', 'TEXTAREA', 'DETAILS'];
 
 export function main() {
@@ -25,31 +26,27 @@ export function main() {
             const startTime = Object.keys(mouseWheelEventLog);
             const date = new Date();
             const ms = date.getTime();
-            chrome.runtime.sendMessage({
-                data: {
-                    eventType: EVENT_TYPES.SCROLL,
-                    scrollTime: ms - startTime,
-                    classList: scrolledNode.className.split(' '),
-                    ms,
-                    x: `${Math.round(x)}`,
-                    y: `${Math.round(y)}`,
-                    width: `${Math.round(width)}`,
-                    height: `${Math.round(height)}`,
-                    centerX: x + width / 2,
-                    centerY: y + height / 2,
-                    date,
-                    type,
-                    time: date
-                        .toISOString()
-                        .split('T')[1]
-                        .replace('Z', '')
-                }
+
+            let [dateStr, time] = date.toISOString().split('T');
+            sendEventMessage({
+                eventType: EVENT_TYPES.SCROLL,
+                scrollTime: ms - startTime,
+                classList: scrolledNode.className.split(' '),
+                ms,
+                x: `${Math.round(x)}`,
+                y: `${Math.round(y)}`,
+                width: `${Math.round(width)}`,
+                height: `${Math.round(height)}`,
+                centerX: x + width / 2,
+                centerY: y + height / 2,
+                date: dateStr,
+                type,
+                time: time.replace('Z', '')
             });
             mouseWheelEventLog = {};
         }, 100);
     });
     document.addEventListener('mousedown', e => {
-        // console.log(chrome.tabs.query({ active: true, currentWindow: true }));
         let { target } = e;
 
         let interactive;
@@ -65,21 +62,19 @@ export function main() {
         let type = interactive.nodeName;
         let [date, time] = new Date().toISOString().split('T');
 
-        chrome.runtime.sendMessage({
-            data: {
-                eventType: EVENT_TYPES.CLICK,
-                ms,
-                x: `${Math.round(x)}`,
-                y: `${Math.round(y)}`,
-                width: `${Math.round(width)}`,
-                height: `${Math.round(height)}`,
-                centerX: x + width / 2,
-                centerY: y + height / 2,
-                nodeText: target.textContent?.trim(),
-                type: type.toLowerCase(),
-                date,
-                time: time.replace('Z', '')
-            }
+        sendEventMessage({
+            eventType: EVENT_TYPES.CLICK,
+            ms,
+            x: `${Math.round(x)}`,
+            y: `${Math.round(y)}`,
+            width: `${Math.round(width)}`,
+            height: `${Math.round(height)}`,
+            centerX: x + width / 2,
+            centerY: y + height / 2,
+            nodeText: target.textContent?.trim(),
+            type: type.toLowerCase(),
+            date,
+            time: time.replace('Z', '')
         });
     });
 
@@ -110,19 +105,12 @@ export function main() {
         const keyChar = String.fromCharCode(96 <= key && key <= 105 ? key - 48 : key);
 
         let [date, time] = new Date().toISOString().split('T');
-        chrome.runtime.sendMessage({
-            data: {
-                eventType: EVENT_TYPES.KEYSTROKE,
-                ms: Date.now(),
-                x: '',
-                y: '',
-                width: '',
-                height: '',
-                nodeText: e.key,
-                type: '',
-                date,
-                time: time.replace('Z', '')
-            }
+        sendEventMessage({
+            eventType: EVENT_TYPES.KEYSTROKE,
+            ms: Date.now(),
+            nodeText: e.key,
+            date,
+            time: time.replace('Z', '')
         });
     });
 }

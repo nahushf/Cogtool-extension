@@ -88,7 +88,6 @@ export class ScrollRecord extends Record {
     }
 
     renderHeader() {
-        console.log(this.record);
         return `<div>Scrolled ${this.record.type} tag with class(es) "${this.record.classList[0]}"</div>`;
     }
 }
