@@ -2,7 +2,8 @@ export const EVENT_TYPES = Object.freeze({
     CLICK: 'click',
     KEYSTROKE: 'keystroke',
     THINK: 'think',
-    SCROLL: 'scroll'
+    SCROLL: 'scroll',
+    SAVE_CONSTANTS: 'save-constants'
 });
 
 export const THINK_TIME = 1200;

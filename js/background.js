@@ -1,5 +1,12 @@
 import { EVENT_TYPES, THINK_TIME, FITTS_CONSTANT } from './constants.js';
-import { getState, recordKey, thinkTimeKey, calculateExpertTime, distanceBetweenCoordinates } from './utils.js';
+import {
+    getState,
+    recordKey,
+    thinkTimeKey,
+    calculateExpertTime,
+    distanceBetweenCoordinates,
+    constantsKey
+} from './utils.js';
 chrome.runtime.onStartup.addListener(() => chrome.storage.local.clear());
 
 chrome.tabs.onRemoved.addListener(tabId => {
@@ -35,9 +42,16 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
     const tabKey = `${sender.tab.id}`;
     getState({
         tabKey,
-        callback: ({ recordState, thinkTimeFlag, records }) => {
+        callback: ({ recordState, thinkTimeFlag, records, constants }) => {
             if (request.startup) {
                 setBadge();
+                return;
+            }
+
+            if (request.eventType === EVENT_TYPES.SAVE_CONSTANTS) {
+                const { a, b } = request;
+                const constantsKeyVal = constantsKey();
+                chrome.storage.local.set({ [constantsKeyVal]: { a, b } });
                 return;
             }
             const recordingFlag = recordState.recording;
@@ -48,7 +62,7 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
                 records.push({ eventType: EVENT_TYPES.THINK, timeTaken: THINK_TIME });
             }
             const lastRecord = records[records.length - 1];
-            const record = marshallRecord(request.data, lastRecord, recordState);
+            const record = marshallRecord(request.data, lastRecord, recordState, constants);
             const { eventType, time, type, nodeText } = record;
             records.push(record);
             chrome.notifications.create(eventType + time, {
@@ -62,7 +76,7 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
     });
 });
 
-function marshallRecord(recordData, lastRecord, recordState) {
+function marshallRecord(recordData, lastRecord, recordState, constants) {
     let { centerX, centerY, width, height, ms } = recordData;
     centerX = centerX || 0;
     centerY = centerY || 0;
@@ -80,7 +94,12 @@ function marshallRecord(recordData, lastRecord, recordState) {
                 y1: previousCenterY,
                 y2: centerY
             });
-            expertTime = calculateExpertTime({ distance, targetSize: Math.min(height, width) });
+            expertTime = calculateExpertTime({
+                distance,
+                targetSize: Math.min(height, width),
+                a: constants.a,
+                b: constants.b
+            });
         }
     }
     return {

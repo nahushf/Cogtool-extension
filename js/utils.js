@@ -8,6 +8,10 @@ export function recordKey(tabKey) {
     return `${tabKey}-recording`;
 }
 
+export function constantsKey() {
+    return `FITTS_CONSTANTS`;
+}
+
 const defaultStorage = chrome.storage.local;
 
 export function setRecordState({ tabKey, storage = defaultStorage, recording, timestamp }) {
@@ -17,12 +21,28 @@ export function setRecordState({ tabKey, storage = defaultStorage, recording, ti
 export function getState({ storage = defaultStorage, callback, tabKey }) {
     const recordKeyVal = recordKey(tabKey);
     const thinkTimeKeyVal = thinkTimeKey(tabKey);
-    storage.get({ [tabKey]: [], [recordKey(tabKey)]: RECORDING_OFF_STATE, [thinkTimeKey(tabKey)]: false }, data => {
-        const recordState = data[recordKeyVal];
-        const thinkTimeFlag = data[thinkTimeKeyVal];
-        const records = data[tabKey];
-        callback({ recordState, thinkTimeFlag, records });
-    });
+    const constantsKeyVal = constantsKey();
+    storage.get(
+        {
+            [tabKey]: [],
+            [recordKeyVal]: RECORDING_OFF_STATE,
+            [thinkTimeKeyVal]: false,
+            [constantsKeyVal]: { a: FITTS_CONSTANT.A, b: FITTS_CONSTANT.B }
+        },
+        data => {
+            const recordState = data[recordKeyVal];
+            const thinkTimeFlag = data[thinkTimeKeyVal];
+            const records = data[tabKey];
+            const constants = data[constantsKeyVal];
+            callback({ recordState, thinkTimeFlag, records, constants });
+        }
+    );
+}
+
+export function getGlobalState({ storage = defaultStorage, callback }) {
+    storage.get(null, data => {
+        callback(data);
+    })
 }
 
 export function calculateSlope({ x2, x1, y2, y1 }) {
@@ -92,8 +112,8 @@ export function lineIntersectionOnRect({ width, height, xB, yB, xA, yA }) {
     };
 }
 
-export function calculateExpertTime({ targetSize, distance }) {
-    return FITTS_CONSTANT.A + FITTS_CONSTANT.B * Math.log2(distance / targetSize + 1);
+export function calculateExpertTime({ targetSize, distance, a, b }) {
+    return a + b * Math.log2(distance / targetSize + 1);
 }
 
 export function distanceBetweenCoordinates({ x1, y1, x2, y2 }) {

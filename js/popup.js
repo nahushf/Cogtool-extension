@@ -151,6 +151,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     const clearBtn = renderer.clearBtn;
     const thinkTimeCheckbox = document.querySelector('#think-time-checkbox');
     const recordingCheckbox = renderer.recordingCheckboxNode;
+    const changeConstantsButton = document.querySelector('#change-constants');
 
     clearBtn.onclick = () => {
         renderer.clear();
@@ -160,7 +161,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     let copyBtn = document.querySelector('.copy-clipboard');
 
     exportBtn.onclick = e => {
-        renderer.getCSV(( keyOrder, csv ) => {
+        renderer.getCSV((keyOrder, csv) => {
             if (!csv) {
                 chrome.notifications.create('noCSV' + new Date().getTime(), {
                     type: 'basic',
@@ -205,6 +206,10 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         });
         renderer.setRecBadge(checked);
         clearBtn.disabled = checked;
+    });
+
+    changeConstantsButton.addEventListener('click', () => {
+        chrome.runtime.openOptionsPage();
     });
 
     renderer.getThinkTimeFlag(checked => (thinkTimeCheckbox.checked = checked));
