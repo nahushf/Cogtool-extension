@@ -46,7 +46,7 @@ class Renderer {
     }
 
     setup() {
-        chrome.browserAction.setBadgeBackgroundColor({ color: '#D2042D' });
+        chrome.action.setBadgeBackgroundColor({ color: '#D2042D' });
         getState({
             tabKey: this.tabKey,
             callback: ({ records, thinkTimeFlag, recordState }) => {
@@ -136,7 +136,7 @@ class Renderer {
     }
 
     setRecBadge(isRecording) {
-        chrome.browserAction.setBadgeText({ tabId: Number(this.tabKey), text: isRecording ? 'rec' : null });
+        chrome.action.setBadgeText({ tabId: Number(this.tabKey), text: isRecording ? 'rec' : '' });
     }
 }
 

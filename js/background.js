@@ -29,16 +29,16 @@ function setBadge() {
         getState({
             tabKey,
             callback({ recordState: { recording: recordingFlag } }) {
-                chrome.browserAction.setBadgeText({
+                chrome.action.setBadgeText({
                     tabId: Number(tabKey),
-                    text: recordingFlag ? 'rec' : null
+                    text: recordingFlag ? 'rec' : ''
                 });
             }
         });
     });
 }
 
-chrome.runtime.onMessage.addListener(async (request, sender) => {
+chrome.runtime.onMessage.addListener((request, sender) => {
     const tabKey = `${sender.tab.id}`;
     getState({
         tabKey,
@@ -74,6 +74,7 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
             chrome.storage.local.set({ [tabKey]: records });
         }
     });
+    return true;
 });
 
 function marshallRecord(recordData, lastRecord, recordState, constants) {

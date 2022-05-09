@@ -21,6 +21,9 @@ export function main() {
             const scrolledNode = path.find(
                 node => node.scrollHeight > node.clientHeight || node.scrollWidth > node.clientWidth
             );
+            if (!scrolledNode) {
+                return;
+            }
             const { x, y, width, height } = scrolledNode.getBoundingClientRect();
             const type = scrolledNode.nodeName;
             const startTime = Object.keys(mouseWheelEventLog);

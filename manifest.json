@@ -1,15 +1,16 @@
 {
     "name": "Events Logger",
-    "manifest_version": 2,
+    "manifest_version": 3,
     "version": "1.0",
     "options_page": "options.html",
     "background": {
-        "page": "background.html"
+        "service_worker": "js/background.js",
+        "type": "module"
     },
     "icons": {
         "32": "icons/icon_32.png"
     },
-    "browser_action": {
+    "action": {
         "default_popup": "popup.html"
     },
     "content_scripts": [
@@ -24,13 +25,19 @@
         }
     ],
     "web_accessible_resources": [
-        "js/*"
+        {
+            "resources":[ "js/*", "js/contentScriptMain.js"],
+            "matches": ["<all_urls>"]
+
+        }
     ],
     "permissions": [
-        "<all_urls>",
         "downloads",
         "storage",
         "unlimitedStorage",
         "notifications"
+    ],
+    "host_permissions":[
+        "<all_urls>"
     ]
 }
