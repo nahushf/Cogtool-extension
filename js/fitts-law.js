@@ -29,87 +29,87 @@ function makeDimension(width, height, top, right, bottom, left) {
 }
 
 // set up dimensions for the plotting.
-let testDimension = makeDimension(620, 400, 30, 30, 30, 30);
-let plotPositionDimension = makeDimension(220, 200, 30, 30, 30, 30);
-let plotVelocitiesDimension = plotPositionDimension;
-let plotHitsDimension = plotPositionDimension;
-let plotScatterDimension = makeDimension(220, 200, 30, 30, 30, 50);
-let scatterEffectiveDimension = makeDimension(540, 300, 30, 30, 30, 50);
-let positionEffectiveDimension = makeDimension(540, 200, 30, 30, 30, 40);
-let speedEffectiveDimension = positionEffectiveDimension;
-let histDimension = makeDimension(540, 300, 30, 30, 30, 50);
+var testDimension = makeDimension(620, 400, 30, 30, 30, 30);
+var plotPositionDimension = makeDimension(220, 200, 30, 30, 30, 30);
+var plotVelocitiesDimension = plotPositionDimension;
+var plotHitsDimension = plotPositionDimension;
+var plotScatterDimension = makeDimension(220, 200, 30, 30, 30, 50);
+var scatterEffectiveDimension = makeDimension(540, 300, 30, 30, 30, 50);
+var positionEffectiveDimension = makeDimension(540, 200, 30, 30, 30, 40);
+var speedEffectiveDimension = positionEffectiveDimension;
+var histDimension = makeDimension(540, 300, 30, 30, 30, 50);
 
-let LIVE_STAY = 1000;
-let MAX_TIME = 2000;
-let UPDATE_DELAY = MAX_TIME;
-let MAX_SPEED = 6; // pixel/ms
-let AArray = [];
-let BArray = [];
+var LIVE_STAY = 1000;
+var MAX_TIME = 2000;
+var UPDATE_DELAY = MAX_TIME;
+var MAX_SPEED = 6; // pixel/ms
+var AArray = [];
+var BArray = [];
 function rHit(r, rTarget) {
     return (plotHitsDimension.innerWidth / 2 / rTarget) * r;
 }
 
 function v(v) {
-    let colour = 'rgb(' + clampInt(0, 255, (v / MAX_SPEED) * 255) + ', 0, 0)';
+    var colour = 'rgb(' + clampInt(0, 255, (v / MAX_SPEED) * 255) + ', 0, 0)';
     return colour;
 }
 
-let scatterX = d3.scale
+var scatterX = d3.scale
     .linear()
     .domain([0.5, 5.5])
     .range([0, plotScatterDimension.innerWidth]);
 
-let scatterY = d3.scale
+var scatterY = d3.scale
     .linear()
     .domain([MAX_TIME, 0])
     .range([0, plotScatterDimension.innerHeight]);
 
-let scaleT = d3.scale
+var scaleT = d3.scale
     .linear()
     .domain([0, 1000])
     .range([0, plotVelocitiesDimension.innerWidth]);
 
-let scaleV = d3.scale
+var scaleV = d3.scale
     .linear()
     .domain([0, MAX_SPEED])
     .range([plotVelocitiesDimension.innerHeight, 0]);
 
-let scaleX = d3.scale
+var scaleX = d3.scale
     .linear()
     .domain([-20, 300])
     .range([0, plotPositionDimension.innerWidth]);
 
-let scaleY = d3.scale
+var scaleY = d3.scale
     .linear()
     .domain([-50, 50])
     .range([plotPositionDimension.innerHeight, 0]);
 
-let effScatterX = d3.scale
+var effScatterX = d3.scale
     .linear()
     .domain([0.5, 6.5])
     .range([0, scatterEffectiveDimension.innerWidth]);
 
-let effScatterY = d3.scale
+var effScatterY = d3.scale
     .linear()
     .domain([MAX_TIME, 0])
     .range([0, scatterEffectiveDimension.innerHeight]);
 
-let effPositionX = d3.scale
+var effPositionX = d3.scale
     .linear()
     .domain([-60, 400])
     .range([0, positionEffectiveDimension.innerWidth]);
 
-let effPositionY = d3.scale
+var effPositionY = d3.scale
     .linear()
     .domain([-50, 50])
     .range([positionEffectiveDimension.innerHeight, 0]);
 
-let effSpeedX = d3.scale
+var effSpeedX = d3.scale
     .linear()
     .domain([0, MAX_TIME])
     .range([0, speedEffectiveDimension.innerWidth]);
 
-let effSpeedY = d3.scale
+var effSpeedY = d3.scale
     .linear()
     .domain([0, MAX_SPEED])
     .range([speedEffectiveDimension.innerHeight, 0]);
@@ -212,7 +212,7 @@ function updateValues(a, b) {
     // setNodeValue(bValueNode, BArray);
 }
 
-let fittsTest = {
+var fittsTest = {
     target: { x: 0, y: 0, r: 10 },
     start: { x: 0, y: 0, t: 0 },
     last: {},
@@ -244,9 +244,9 @@ let fittsTest = {
         this.currentPosition =
             (this.currentPosition + Math.ceil(this.isoPositions.length / 2)) % this.isoPositions.length;
 
-        let target = testAreaSVG.selectAll('#target').data([this.target]);
+        var target = testAreaSVG.selectAll('#target').data([this.target]);
 
-        let insert = function(d) {
+        var insert = function(d) {
             d.attr('cx', function(d) {
                 return d.x;
             })
@@ -275,9 +275,9 @@ let fittsTest = {
 
         this.generateISOPositions(this.isoParams.num, this.isoParams.distance, this.isoParams.width);
 
-        let circles = testAreaSVG.selectAll('circle').data(this.isoPositions);
+        var circles = testAreaSVG.selectAll('circle').data(this.isoPositions);
 
-        let insert = function(d) {
+        var insert = function(d) {
             d.attr('cx', function(d) {
                 return d.x;
             })
@@ -335,7 +335,7 @@ let fittsTest = {
 
         this.isoPositions = [];
 
-        for (let i = 0; i < num; i++) {
+        for (var i = 0; i < num; i++) {
             this.isoPositions[i] = {
                 x: testDimension.cx + (d / 2) * Math.cos((2 * Math.PI * i) / num),
                 y: testDimension.cy + (d / 2) * Math.sin((2 * Math.PI * i) / num),
@@ -400,13 +400,13 @@ let fittsTest = {
             }
             this.updateTimeoutHandle = window.setTimeout(this.updatePlots, UPDATE_DELAY, this);
 
-            let newPoint = { x: x, y: y, t: new Date().getTime() };
+            var newPoint = { x: x, y: y, t: new Date().getTime() };
             this.currentPath.push(newPoint);
 
-            let dt = newPoint.t - this.last.t;
-            let dist = distance(this.last, { x: x, y: y });
-            if (dt > 0) let speed = dist / dt;
-            else let speed = 0;
+            var dt = newPoint.t - this.last.t;
+            var dist = distance(this.last, { x: x, y: y });
+            if (dt > 0) var speed = dist / dt;
+            else var speed = 0;
 
             testAreaSVG
                 .append('line')
@@ -429,12 +429,12 @@ let fittsTest = {
         // add point to data array for plotting into ID/time scatter plot
         if (this.active == false) return;
 
-        let dt = data.hit.t - data.start.t;
+        var dt = data.hit.t - data.start.t;
 
         if (dt < MAX_TIME) {
             // skip if obvious outlier
-            let dist = distance(data.target, data.start);
-            let id = shannon(dist, data.target.w);
+            var dist = distance(data.target, data.start);
+            var id = shannon(dist, data.target.w);
 
             this.data[this.currentDataSet].data.push({
                 time: dt,
@@ -458,12 +458,12 @@ let fittsTest = {
 // .ease('bounce')
 // .attr('r', 3);
 
-            let A = data.start;
-            let B = data.target;
-            let path = data.path;
+            var A = data.start;
+            var B = data.target;
+            var path = data.path;
 
-            let hit = {};
-            let q = project(A, B, data.hit);
+            var hit = {};
+            var q = project(A, B, data.hit);
             hit.x = distance(q, B) * sign(q.t - 1);
             hit.y = distance(q, data.hit) * isLeft(A, B, data.hit);
 
@@ -480,18 +480,18 @@ let fittsTest = {
 // .ease('linear')
 // .attr('r', 3);
 
-            let last = { x: 0, y: 0, t: data.start.t, v: 0 };
-            for (let i = 0; i < path.length; i++) {
-                let p = path[i];
+            var last = { x: 0, y: 0, t: data.start.t, v: 0 };
+            for (var i = 0; i < path.length; i++) {
+                var p = path[i];
 
-                let q = project(A, B, p);
-                let x = distance(q, A) * sign(q.t);
-                let y = distance(q, p) * isLeft(A, B, p);
+                var q = project(A, B, p);
+                var x = distance(q, A) * sign(q.t);
+                var y = distance(q, p) * isLeft(A, B, p);
 
-                let dt = p.t - last.t;
-                let dist = distance(last, { x: x, y: y });
-                if (dt > 0) let speed = dist / dt;
-                else let speed = 0;
+                var dt = p.t - last.t;
+                var dist = distance(last, { x: x, y: y });
+                if (dt > 0) var speed = dist / dt;
+                else var speed = 0;
 
 // plotPositionGroup
 // .append('svg:line')
@@ -518,7 +518,7 @@ let fittsTest = {
 // .duration(LIVE_STAY)
 // .style('stroke-opacity', 0.5);
 
-                let last = {};
+                var last = {};
                 last.x = x;
                 last.y = y;
                 last.t = p.t;
@@ -544,26 +544,26 @@ let fittsTest = {
         this.updatePlots(this);
 
         this.dataCnt++;
-        let num = this.dataCnt;
-        let colour = this.colour(randomAB(0, 10));
+        var num = this.dataCnt;
+        var colour = this.colour(randomAB(0, 10));
 
         this.data[num] = { data: [], colour: colour };
 
         this.currentDataSet = num;
-// let div = d3
+// var div = d3
 // .select('#dataSets')
 // .append('div')
 // .attr('id', 'dataSet' + num)
 // .text('Data Set ' + num + ' ')
 // .style('background-color', colour);
 
-        let buttonID = 'removeDataSet' + num;
+        var buttonID = 'removeDataSet' + num;
 // div.append('button')
 // .attr('id', buttonID)
 // .attr('type', 'button')
 // .text('delete!');
 
-        let that = this;
+        var that = this;
 
         $('#' + buttonID).click(function() {
             that.deleteDataSet(num);
@@ -625,7 +625,7 @@ let fittsTest = {
                 .remove();
 
             if (num == this.currentDataSet) {
-                let first = parseInt(assFirstKey(this.data));
+                var first = parseInt(assFirstKey(this.data));
                 this.currentDataSet = first;
                 this.highlightDataSet(first);
             }
@@ -660,24 +660,24 @@ let fittsTest = {
         // compute We and IDe and Throughput for each category
 
         // process data
-        let dataSetIndex = -1; // evil hack to make it start at 0 then.
-        for (let key in that.data) {
+        var dataSetIndex = -1; // evil hack to make it start at 0 then.
+        for (var key in that.data) {
             // for each data set
 
             dataSetIndex++;
 
-            let groups = [];
-            for (let i = 0; i < that.data[key].data.length; i++) {
+            var groups = [];
+            for (var i = 0; i < that.data[key].data.length; i++) {
                 // for each datum
-                let datum = that.data[key].data[i];
-                let groupID = datum.distance.toString() + datum.width.toString();
+                var datum = that.data[key].data[i];
+                var groupID = datum.distance.toString() + datum.width.toString();
                 if (!groups[groupID]) {
                     groups[groupID] = [];
                 }
 
-                let q = project(datum.start, datum.target, datum.hit);
-                // let x = distance(q, datum.start) * sign(q.t);
-                let y = distance(q, datum.hit) * isLeft(datum.start, datum.target, datum.hit);
+                var q = project(datum.start, datum.target, datum.hit);
+                // var x = distance(q, datum.start) * sign(q.t);
+                var y = distance(q, datum.hit) * isLeft(datum.start, datum.target, datum.hit);
 
                 datum.realDistance = distance(datum.start, datum.hit); // use real distance here.
                 datum.projectedHitOffsetX = distance(q, datum.target) * sign(q.t - 1);
@@ -686,35 +686,35 @@ let fittsTest = {
                 groups[groupID].push(datum);
             }
 
-            let newData = [];
-            for (let group in groups) {
+            var newData = [];
+            for (var group in groups) {
                 if (groups[group].length < 3) {
                     // exlcude groups with length < 3
                     continue;
                 }
 
-                let xEffective =
+                var xEffective =
                     4.133 *
                     Math.sqrt(
                         variance(groups[group], function(d) {
                             return d.projectedHitOffsetX;
                         })
                     );
-                let yEffective =
+                var yEffective =
                     4.133 *
                     Math.sqrt(
                         variance(groups[group], function(d) {
                             return d.projectedHitOffsetY;
                         })
                     );
-                let dEffective = mean(groups[group], function(d) {
+                var dEffective = mean(groups[group], function(d) {
                     return d.realDistance;
                 });
 
-                for (let i = 0; i < groups[group].length; i++) {
-                    let datum = groups[group][i];
-                    let We = Math.min(xEffective, yEffective); // SMALLER-OF model (MacKenzie, Buxton 92)
-                    let De = dEffective;
+                for (var i = 0; i < groups[group].length; i++) {
+                    var datum = groups[group][i];
+                    var We = Math.min(xEffective, yEffective); // SMALLER-OF model (MacKenzie, Buxton 92)
+                    var De = dEffective;
                     datum.IDe = shannon(De, We);
                     datum.throughput = 1000 * (datum.IDe / datum.time);
                     newData.push(datum);
@@ -722,9 +722,9 @@ let fittsTest = {
             }
 
             // insert stuff in SVG
-            let colour = that.data[key].colour;
+            var colour = that.data[key].colour;
 
-            let insert = function(d) {
+            var insert = function(d) {
                 d.attr('cx', function(d) {
                     return effScatterX(d.IDe);
                 })
@@ -734,7 +734,7 @@ let fittsTest = {
                     .attr('r', 5);
             };
 
-            let circles = scatterEffectiveGroup.selectAll('circle.cat' + key).data(newData);
+            var circles = scatterEffectiveGroup.selectAll('circle.cat' + key).data(newData);
 
             circles
                 .enter()
@@ -750,7 +750,7 @@ let fittsTest = {
                 .call(insert);
 
             // ==================== regression ========================
-            let covTIDe = cov(
+            var covTIDe = cov(
                 newData,
                 function(d) {
                     return d.time;
@@ -760,25 +760,25 @@ let fittsTest = {
                 }
             );
 
-            let varIDe = variance(newData, function(d) {
+            var varIDe = variance(newData, function(d) {
                 return d.IDe;
             });
 
-            if (varIDe > 0) let b = covTIDe / varIDe;
-            else let b = 0;
+            if (varIDe > 0) var b = covTIDe / varIDe;
+            else var b = 0;
 
-            let mT = mean(newData, function(d) {
+            var mT = mean(newData, function(d) {
                 return d.time;
             });
-            let mIDe = mean(newData, function(d) {
+            var mIDe = mean(newData, function(d) {
                 return d.IDe;
             });
-            let a = mT - b * mIDe;
+            var a = mT - b * mIDe;
 
             updateValues(a, b);
 
             if (!isNaN(a)) {
-                let makeLine = function(d) {
+                var makeLine = function(d) {
                     return d
                         .attr('x1', 0)
                         .attr('x2', scatterEffectiveDimension.innerWidth)
@@ -790,7 +790,7 @@ let fittsTest = {
                         });
                 };
 
-                let regression = scatterEffectiveGroup
+                var regression = scatterEffectiveGroup
                     .selectAll('line.cat' + key)
                     .data([{ y1: a + b * 0.5, y2: a + b * 6.5 }]);
 
@@ -806,7 +806,7 @@ let fittsTest = {
             }
 
             // ============== histogram ====================
-            let histThroughput = d3.layout
+            var histThroughput = d3.layout
                 .histogram()
                 .bins(20)
                 .range([0, 10])
@@ -814,11 +814,11 @@ let fittsTest = {
                     return d.throughput;
                 });
 
-            let throughputHistogramData = histThroughput(newData);
+            var throughputHistogramData = histThroughput(newData);
 
             //		histYMax = d3.max(throughputHistogramData, function(d) { return d.y; });
 
-            let histX = d3.scale
+            var histX = d3.scale
                 .ordinal()
                 .domain(
                     throughputHistogramData.map(function(d) {
@@ -827,7 +827,7 @@ let fittsTest = {
                 )
                 .rangeRoundBands([0, histDimension.innerWidth]);
 
-            let histY = d3.scale
+            var histY = d3.scale
                 .linear()
                 .domain([
                     0,
@@ -837,12 +837,12 @@ let fittsTest = {
                 ])
                 .range([histDimension.innerHeight, 0]);
 
-// let throughputRect = throughputGroup.selectAll('rect.cat' + key).data(throughputHistogramData);
+// var throughputRect = throughputGroup.selectAll('rect.cat' + key).data(throughputHistogramData);
 
-            let numDataSets = assSize(that.data);
-            let xOffset = (histX.rangeBand() / numDataSets) * dataSetIndex;
+            var numDataSets = assSize(that.data);
+            var xOffset = (histX.rangeBand() / numDataSets) * dataSetIndex;
 
-            let makeRect = function(d) {
+            var makeRect = function(d) {
                 d.attr(
                     'x',
                     (function(offset) {
@@ -870,12 +870,12 @@ let fittsTest = {
                     );
             };
 
-            let histXAxis = d3.svg
+            var histXAxis = d3.svg
                 .axis()
                 .scale(histX)
                 .ticks(2);
 
-            let histYAxis = d3.svg
+            var histYAxis = d3.svg
                 .axis()
                 .scale(histY)
                 .ticks(5);
@@ -907,25 +907,25 @@ let fittsTest = {
 
             // ==================== eff position and speed ===================
             // more or less copy-pasted from above
-            for (let i = 0; i < newData.length; i++) {
-                let last = { x: 0, y: 0, t: newData[i].start.t, v: 0 };
-                let A = newData[i].start;
-                let B = newData[i].target;
-                let dAB = distance(A, B);
-                let offset = newData[i].distance - dAB;
+            for (var i = 0; i < newData.length; i++) {
+                var last = { x: 0, y: 0, t: newData[i].start.t, v: 0 };
+                var A = newData[i].start;
+                var B = newData[i].target;
+                var dAB = distance(A, B);
+                var offset = newData[i].distance - dAB;
                 offset = 0;
 
-                for (let j = 0; j < newData[i].path.length; j++) {
-                    let p = newData[i].path[j];
+                for (var j = 0; j < newData[i].path.length; j++) {
+                    var p = newData[i].path[j];
 
-                    let q = project(A, B, p);
-                    let x = distance(q, A) * sign(q.t);
-                    let y = distance(q, p) * isLeft(A, B, p);
+                    var q = project(A, B, p);
+                    var x = distance(q, A) * sign(q.t);
+                    var y = distance(q, p) * isLeft(A, B, p);
 
-                    let dt = p.t - last.t;
-                    let dist = distance(last, { x: x, y: y });
-                    if (dt > 0) let speed = dist / dt;
-                    else let speed = 0;
+                    var dt = p.t - last.t;
+                    var dist = distance(last, { x: x, y: y });
+                    if (dt > 0) var speed = dist / dt;
+                    else var speed = 0;
 
 // positionEffectiveGroup
 // .append('line')
@@ -947,7 +947,7 @@ let fittsTest = {
 // .style('stroke', colour)
 // .style('opacity', 0.5);
 
-                    let last = {};
+                    var last = {};
                     last.x = x;
                     last.y = y;
                     last.t = p.t;
@@ -965,11 +965,11 @@ function cov(data, extractorA, extractorB) {
         return 0;
     }
 
-    let mA = mean(data, extractorA);
-    let mB = mean(data, extractorB);
+    var mA = mean(data, extractorA);
+    var mB = mean(data, extractorB);
 
-    let cov = 0;
-    for (let i = 0; i < data.length; i++) {
+    var cov = 0;
+    for (var i = 0; i < data.length; i++) {
         cov += (extractorA(data[i]) - mA) * (extractorB(data[i]) - mB);
     }
 
@@ -981,8 +981,8 @@ function variance(data, extractor) {
 }
 
 function mean(data, extractor) {
-    let sum = 0;
-    for (let i = 0; i < data.length; i++) {
+    var sum = 0;
+    for (var i = 0; i < data.length; i++) {
         sum += extractor(data[i]);
     }
     return sum / data.length;
@@ -993,22 +993,22 @@ function randomAB(a, b) {
 }
 
 function assSize(assArr) {
-    let size = 0;
-    for (let _ in assArr) {
+    var size = 0;
+    for (var _ in assArr) {
         size++;
     }
     return size;
 }
 
 function assFirstKey(assArr) {
-    for (let key in assArr) {
+    for (var key in assArr) {
         return key;
         break;
     }
 }
 
 function assIsKey(needle, assArr) {
-    for (let key in assArr) {
+    for (var key in assArr) {
         if (needle == key) {
             return true;
         }
@@ -1021,24 +1021,24 @@ function assIsKey(needle, assArr) {
  * Code taken from: http://www.alecjacobson.com/weblog/?p=1486
  */
 function project(A, B, p) {
-    let AB = minus(B, A);
-    let AB_squared = dot(AB, AB);
+    var AB = minus(B, A);
+    var AB_squared = dot(AB, AB);
     if (AB_squared == 0) {
         return A;
     } else {
-        let Ap = minus(p, A);
-        let t = dot(Ap, AB) / AB_squared;
+        var Ap = minus(p, A);
+        var t = dot(Ap, AB) / AB_squared;
         return { x: A.x + t * AB.x, y: A.y + t * AB.y, t: t };
     }
 }
 
 function mouseMoved() {
-let m = d3.svg.mouse(this);
+var m = d3.svg.mouse(this);
     fittsTest.mouseMoved(m[0], m[1]);
 }
 
 function mouseClicked() {
-    let m = d3.svg.mouse(this);
+    var m = d3.svg.mouse(this);
     fittsTest.mouseClicked(m[0], m[1]);
 }
 
@@ -1056,8 +1056,8 @@ function minus(a, b) {
 }
 
 function distance(a, b) {
-    let dx = a.x - b.x;
-    let dy = a.y - b.y;
+    var dx = a.x - b.x;
+    var dy = a.y - b.y;
     return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 }
 
@@ -1087,7 +1087,7 @@ function bgRect(d, dim) {
         .attr('class', 'back');
 }
 
-let testAreaSVG = d3
+var testAreaSVG = d3
     .select('#test-area')
     .append('svg')
     .attr('width', testDimension.width)
@@ -1097,22 +1097,22 @@ let testAreaSVG = d3
     .on('mousedown', mouseClicked)
     .call(bgRect, testDimension);
 
-// let plotPositionSVG = d3
+// var plotPositionSVG = d3
 // .select('#plot-positions')
 // .append('svg')
 // .attr('width', plotPositionDimension.width)
 // .attr('height', plotPositionDimension.height)
 // .call(bgRect, plotPositionDimension);
 
-// let plotPositionGroup = plotPositionSVG
+// var plotPositionGroup = plotPositionSVG
 // .append('g')
 // .attr('transform', 'translate(' + plotPositionDimension.left + ', ' + plotPositionDimension.top + ')');
 
-let positionXAxis = d3.svg
+var positionXAxis = d3.svg
     .axis()
     .scale(scaleX)
     .ticks(7);
-let positionYAxis = d3.svg
+var positionYAxis = d3.svg
     .axis()
     .scale(scaleY)
     .ticks(6);
@@ -1126,14 +1126,14 @@ let positionYAxis = d3.svg
 // .attr('class', 'axis')
 // .call(positionYAxis.tickSize(-plotPositionDimension.innerWidth).orient('left'));
 
-// let plotHitsSVG = d3
+// var plotHitsSVG = d3
 // .select('#plot-hits')
 // .append('svg')
 // .attr('width', plotHitsDimension.width)
 // .attr('height', plotHitsDimension.height)
 // .call(bgRect, plotHitsDimension);
 
-// let plotHitsGroup = plotHitsSVG
+// var plotHitsGroup = plotHitsSVG
 // .append('g')
 // .attr('transform', 'translate(' + plotHitsDimension.cx + ', ' + plotHitsDimension.cy + ')');
 // plotHitsGroup
@@ -1161,22 +1161,22 @@ let positionYAxis = d3.svg
 // .attr('x2', -10)
 // .attr('y2', 10);
 
-// let plotVelocitiesSVG = d3
+// var plotVelocitiesSVG = d3
 // .select('#plot-velocities')
 // .append('svg')
 // .attr('width', plotVelocitiesDimension.width)
 // .attr('height', plotVelocitiesDimension.height)
 // .call(bgRect, plotVelocitiesDimension);
 
-// let plotVelocitiesGroup = plotVelocitiesSVG
+// var plotVelocitiesGroup = plotVelocitiesSVG
 // .append('g')
 // .attr('transform', 'translate(' + plotVelocitiesDimension.left + ', ' + plotVelocitiesDimension.top + ')');
 
-let speedXAxis = d3.svg
+var speedXAxis = d3.svg
     .axis()
     .scale(scaleT)
     .ticks(7);
-let speedYAxis = d3.svg
+var speedYAxis = d3.svg
     .axis()
     .scale(scaleV)
     .ticks(6);
@@ -1202,24 +1202,24 @@ let speedYAxis = d3.svg
 // 	.attr('transform', 'rotate(-90, -20, 80)')
 // 	.style('text-anchor', 'middle');
 
-// let scatterSVG = d3
+// var scatterSVG = d3
 // .select('#plot-scatter')
 // .append('svg')
 // .attr('width', plotScatterDimension.width)
 // .attr('height', plotScatterDimension.height)
 // .call(bgRect, plotScatterDimension);
 
-// let scatterGroup = scatterSVG
+// var scatterGroup = scatterSVG
 // .append('g')
 // .attr('transform', 'translate(' + plotScatterDimension.left + ',' + plotScatterDimension.top + ' )');
 
 // define Axes.
-let xAxis = d3.svg
+var xAxis = d3.svg
     .axis()
     .scale(scatterX)
     .ticks(7)
     .tickSize(6, 3, 0);
-let yAxis = d3.svg
+var yAxis = d3.svg
     .axis()
     .scale(scatterY)
     .ticks(6)
@@ -1246,25 +1246,25 @@ let yAxis = d3.svg
 // 	.attr('transform', 'rotate(-90, -20, 80)')
 // 	.style('text-anchor', 'middle');
 
-let scatterEffectiveSVG = d3
+var scatterEffectiveSVG = d3
     .select('#scatterEffective')
     .append('svg')
     .attr('width', scatterEffectiveDimension.width)
     .attr('height', scatterEffectiveDimension.height)
     .call(bgRect, scatterEffectiveDimension);
 
-let scatterEffectiveGroup = scatterEffectiveSVG
+var scatterEffectiveGroup = scatterEffectiveSVG
     .append('g')
     .attr('transform', 'translate(' + scatterEffectiveDimension.left + ',' + scatterEffectiveDimension.top + ' )');
 
 // define Axes.
-let effXAxis = d3.svg
+var effXAxis = d3.svg
     .axis()
     .scale(effScatterX)
     .ticks(10)
     .tickSize(6, 3, 0);
 
-let effYAxis = d3.svg
+var effYAxis = d3.svg
     .axis()
     .scale(effScatterY)
     .ticks(10)
@@ -1283,41 +1283,41 @@ scatterEffectiveGroup
     // .attr("transform", "translate( 0, " + plotScatterDimension.height + ")")
     .call(effYAxis.tickSize(-scatterEffectiveDimension.innerWidth).orient('left'));
 
-// let throughputSVG = d3
+// var throughputSVG = d3
 // .select('#throughput')
 // .append('svg')
 // .attr('width', histDimension.width)
 // .attr('height', histDimension.height)
 // .call(bgRect, histDimension);
 
-// let throughputGroup = throughputSVG
+// var throughputGroup = throughputSVG
 // .append('g')
 // .attr('transform', 'translate(' + histDimension.left + ',' + histDimension.top + ' )');
 
 //	.call(histYAxis.tickSize(histDimension.innerWidth).orient("left"));
 
-// let positionEffectiveSVG = d3
+// var positionEffectiveSVG = d3
 // .select('#positionEffective')
 // .append('svg')
 // .attr('width', positionEffectiveDimension.width)
 // .attr('height', positionEffectiveDimension.height)
 // .call(bgRect, positionEffectiveDimension);
 
-// let positionTargetsGroup = positionEffectiveSVG
+// var positionTargetsGroup = positionEffectiveSVG
 // .append('g')
 // .attr('transform', 'translate(' + positionEffectiveDimension.left + ',' + positionEffectiveDimension.top + ' )');
 
-// let positionEffectiveGroup = positionEffectiveSVG
+// var positionEffectiveGroup = positionEffectiveSVG
 // .append('g')
 // .attr('transform', 'translate(' + positionEffectiveDimension.left + ',' + positionEffectiveDimension.top + ' )');
 
-let positionEffXAxis = d3.svg
+var positionEffXAxis = d3.svg
     .axis()
     .scale(effPositionX)
     .ticks(10)
     .tickSize(-positionEffectiveDimension.innerHeight);
 
-let positionEffYAxis = d3.svg
+var positionEffYAxis = d3.svg
     .axis()
     .scale(effPositionY)
     .ticks(5)
@@ -1334,24 +1334,24 @@ let positionEffYAxis = d3.svg
 // .attr('class', 'axis')
 // .call(positionEffYAxis.orient('left'));
 
-// let speedEffectiveSVG = d3
+// var speedEffectiveSVG = d3
 // .select('#speedEffective')
 // .append('svg')
 // .attr('width', speedEffectiveDimension.width)
 // .attr('height', speedEffectiveDimension.height)
 // .call(bgRect, speedEffectiveDimension);
 
-// let speedEffectiveGroup = speedEffectiveSVG
+// var speedEffectiveGroup = speedEffectiveSVG
 // .append('g')
 // .attr('transform', 'translate(' + speedEffectiveDimension.left + ',' + speedEffectiveDimension.top + ' )');
 
-let speedEffXAxis = d3.svg
+var speedEffXAxis = d3.svg
     .axis()
     .scale(effSpeedX)
     .ticks(10)
     .tickSize(-speedEffectiveDimension.innerHeight);
 
-let speedEffYAxis = d3.svg
+var speedEffYAxis = d3.svg
     .axis()
     .scale(effSpeedY)
     .ticks(5)
