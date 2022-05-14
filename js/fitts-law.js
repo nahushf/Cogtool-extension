@@ -29,7 +29,7 @@ function makeDimension(width, height, top, right, bottom, left) {
 }
 
 // set up dimensions for the plotting.
-var testDimension = makeDimension(620, 400, 30, 30, 30, 30);
+var testDimension = makeDimension(620, 550, 30, 30, 30, 30);
 var plotPositionDimension = makeDimension(220, 200, 30, 30, 30, 30);
 var plotVelocitiesDimension = plotPositionDimension;
 var plotHitsDimension = plotPositionDimension;
@@ -63,6 +63,7 @@ var scatterY = d3.scale
     .linear()
     .domain([MAX_TIME, 0])
     .range([0, plotScatterDimension.innerHeight]);
+console.log('miss');
 
 var scaleT = d3.scale
     .linear()
@@ -153,7 +154,6 @@ function generateCurrentStateListener(stateNode, textNode) {
 aNewState.addEventListener('change', generateNewStateListener(aNewState, aValueNode));
 bNewState.addEventListener('change', generateNewStateListener(bNewState, bValueNode));
 
-
 getGlobalState({
     callback: data => {
         const { a, b } = data[constantsKey()] || { a: FITTS_CONSTANT.A, b: FITTS_CONSTANT.B };
@@ -183,7 +183,8 @@ saveButton.addEventListener('click', () => {
     }
     chrome.runtime.sendMessage({
         eventType: EVENT_TYPES.SAVE_CONSTANTS,
-        a, b
+        a,
+        b
     });
 });
 
@@ -275,63 +276,76 @@ var fittsTest = {
 
         this.generateISOPositions(this.isoParams.num, this.isoParams.distance, this.isoParams.width);
 
-        var circles = testAreaSVG.selectAll('circle').data(this.isoPositions);
-
-        var insert = function(d) {
-            d.attr('cx', function(d) {
-                return d.x;
-            })
-                .attr('cy', function(d) {
-                    return d.y;
-                })
-                .attr('r', function(d) {
-                    return d.w / 2;
-                });
-        };
-
-        circles
-            .enter()
-            .append('circle')
-            .attr('class', 'iso')
-            .call(insert);
-
-        circles.transition().call(insert);
-
-        circles
-            .exit()
-            .transition()
-            .attr('r', 0)
-            .remove();
-
-        this.currentPosition = 0;
+        console.log(123, this.isoPositions);
+        const svgNode = testAreaSVG[0][0];
+        const circleNodes = Array.from(svgNode.querySelectorAll('circle.iso'));
+        circleNodes.forEach(node => svgNode.removeChild(node));
+        this.isoPositions.forEach(({ x, y, w }) => {
+            const circleNode = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circleNode.setAttribute('cx', x);
+            circleNode.setAttribute('cy', y);
+            circleNode.setAttribute('r', w / 2);
+            circleNode.setAttribute('class', 'iso');
+            svgNode.appendChild(circleNode);
+        });
         this.generateTarget();
-        this.active = false;
+        // var circles = testAreaSVG.selectAll('circle').data(this.isoPositions);
+
+        // var insert = function(d) {
+        // d.attr('cx', function(d) {
+        // return d.x;
+        // })
+        // .attr('cy', function(d) {
+        // return d.y;
+        // })
+        // .attr('r', function(d) {
+        // return d.w / 2;
+        // });
+        // };
+
+        // circles
+        // .enter()
+        // .append('circle')
+        // .attr('class', 'iso')
+        // .call(insert);
+
+        // circles.transition().call(insert);
+
+        // circles
+        // .exit()
+        // .transition()
+        // .attr('r', 0)
+        // .remove();
+
+        // this.currentPosition = 0;
+        // this.generateTarget();
+        // this.active = false;
     },
 
     generateISOPositions: function(num, d, w) {
         // remove all data from live view
-// plotHitsGroup
-// .selectAll('circle.hit')
-// .transition()
-// .duration(LIVE_STAY)
-// .ease('linear')
-// .attr('r', 2)
-// .style('opacity', 0)
-// .remove();
+        // plotHitsGroup
+        // .selectAll('circle.hit')
+        // .transition()
+        // .duration(LIVE_STAY)
+        // .ease('linear')
+        // .attr('r', 2)
+        // .style('opacity', 0)
+        // .remove();
 
-// plotPositionGroup
-// .selectAll('line.live')
-// .transition()
-// .duration(LIVE_STAY)
-// .style('stroke-opacity', 0)
-// .remove();
+        // plotPositionGroup
+        // .selectAll('line.live')
+        // .transition()
+        // .duration(LIVE_STAY)
+        // .style('stroke-opacity', 0)
+        // .remove();
 
-// plotVelocitiesGroup
-// .selectAll('line.live')
-// .transition()
-// .duration(LIVE_STAY)
-// .style('stroke-opacity', 0)
-// .remove();
+        // plotVelocitiesGroup
+        // .selectAll('line.live')
+        // .transition()
+        // .duration(LIVE_STAY)
+        // .style('stroke-opacity', 0)
+        // .remove();
 
         this.isoPositions = [];
 
@@ -366,6 +380,7 @@ var fittsTest = {
             this.removeTarget();
 
             if (this.isoParams.randomize && this.currentCount >= this.isoPositions.length) {
+                console.log(33);
                 this.randomizeParams();
                 this.currentCount = 0;
                 this.currentPosition = 0;
@@ -408,18 +423,33 @@ var fittsTest = {
             if (dt > 0) var speed = dist / dt;
             else var speed = 0;
 
-            testAreaSVG
-                .append('line')
-                // .attr('class', '')
-                .attr('x1', this.last.x)
-                .attr('x2', newPoint.x)
-                .attr('y1', this.last.y)
-                .attr('y2', newPoint.y)
-                .style('stroke', v(speed))
-                .transition()
-                .duration(5000)
-                .style('stroke-opacity', 0)
-                .remove();
+            const lineStyles = {
+                x1: this.last.x,
+                x2: newPoint.x,
+                y1: this.last.y,
+                y2: newPoint.y,
+                style: `stroke: black; stroke-width:1 `
+            };
+            const lineElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            Object.entries(lineStyles).map(([key, value]) => lineElement.setAttribute(key, value));
+            const svgNode = testAreaSVG[0][0];
+            svgNode.appendChild(lineElement);
+            setTimeout(() => {
+                svgNode.removeChild(lineElement);
+            }, 2000);
+
+            // testAreaSVG
+            // .append('line')
+            // // .attr('class', '')
+            // .attr('x1', this.last.x)
+            // .attr('x2', newPoint.x)
+            // .attr('y1', this.last.y)
+            // .attr('y2', newPoint.y)
+            // .style('stroke', v(speed))
+            // .transition()
+            // .duration(5000)
+            // .style('stroke-opacity', 0)
+            // .remove();
 
             this.last = newPoint;
         }
@@ -446,17 +476,17 @@ var fittsTest = {
                 path: data.path
             });
 
-// scatterGroup
-// .append('circle')
-// .attr('class', 'cat' + this.currentDataSet)
-// .style('fill', this.data[this.currentDataSet].colour)
-// .attr('cx', scatterX(id))
-// .attr('cy', scatterY(dt))
-// .attr('r', 0)
-// .transition()
-// .duration(200)
-// .ease('bounce')
-// .attr('r', 3);
+            // scatterGroup
+            // .append('circle')
+            // .attr('class', 'cat' + this.currentDataSet)
+            // .style('fill', this.data[this.currentDataSet].colour)
+            // .attr('cx', scatterX(id))
+            // .attr('cy', scatterY(dt))
+            // .attr('r', 0)
+            // .transition()
+            // .duration(200)
+            // .ease('bounce')
+            // .attr('r', 3);
 
             var A = data.start;
             var B = data.target;
@@ -467,18 +497,18 @@ var fittsTest = {
             hit.x = distance(q, B) * sign(q.t - 1);
             hit.y = distance(q, data.hit) * isLeft(A, B, data.hit);
 
-// plotHitsGroup
-// .append('circle')
-// .attr('class', 'hit')
-// .attr('cx', rHit(hit.x, data.target.w / 2))
-// .attr('cy', rHit(hit.y, data.target.w / 2))
-// .attr('r', 6)
-// .style('fill', 'red')
-// .style('opacity', 1)
-// .transition()
-// .duration(500)
-// .ease('linear')
-// .attr('r', 3);
+            // plotHitsGroup
+            // .append('circle')
+            // .attr('class', 'hit')
+            // .attr('cx', rHit(hit.x, data.target.w / 2))
+            // .attr('cy', rHit(hit.y, data.target.w / 2))
+            // .attr('r', 6)
+            // .style('fill', 'red')
+            // .style('opacity', 1)
+            // .transition()
+            // .duration(500)
+            // .ease('linear')
+            // .attr('r', 3);
 
             var last = { x: 0, y: 0, t: data.start.t, v: 0 };
             for (var i = 0; i < path.length; i++) {
@@ -493,30 +523,30 @@ var fittsTest = {
                 if (dt > 0) var speed = dist / dt;
                 else var speed = 0;
 
-// plotPositionGroup
-// .append('svg:line')
-// .attr('class', 'live')
-// .attr('x1', scaleX(last.x))
-// .attr('x2', scaleX(x))
-// .attr('y1', scaleY(last.y))
-// .attr('y2', scaleY(y))
-// .style('stroke', v(speed))
-// .transition()
-// .duration(LIVE_STAY)
-// .style('stroke-opacity', 0.5);
+                // plotPositionGroup
+                // .append('svg:line')
+                // .attr('class', 'live')
+                // .attr('x1', scaleX(last.x))
+                // .attr('x2', scaleX(x))
+                // .attr('y1', scaleY(last.y))
+                // .attr('y2', scaleY(y))
+                // .style('stroke', v(speed))
+                // .transition()
+                // .duration(LIVE_STAY)
+                // .style('stroke-opacity', 0.5);
 
-// plotVelocitiesGroup
-// .append('svg:line')
-// .attr('class', 'live')
-// .attr('x1', scaleT(last.t - data.start.t))
-// .attr('x2', scaleT(p.t - data.start.t))
-// .attr('y1', scaleV(last.v))
-// .attr('y2', scaleV(speed))
+                // plotVelocitiesGroup
+                // .append('svg:line')
+                // .attr('class', 'live')
+                // .attr('x1', scaleT(last.t - data.start.t))
+                // .attr('x2', scaleT(p.t - data.start.t))
+                // .attr('y1', scaleV(last.v))
+                // .attr('y2', scaleV(speed))
 
-// .style('stroke', v(speed))
-// .transition()
-// .duration(LIVE_STAY)
-// .style('stroke-opacity', 0.5);
+                // .style('stroke', v(speed))
+                // .transition()
+                // .duration(LIVE_STAY)
+                // .style('stroke-opacity', 0.5);
 
                 var last = {};
                 last.x = x;
@@ -528,12 +558,13 @@ var fittsTest = {
     },
 
     randomizeParams: function() {
-        this.isoParams.distance = Math.floor(randomAB(this.isoLimits.minD, this.isoLimits.maxD));
-        this.isoParams.width = Math.floor(randomAB(this.isoLimits.minW, this.isoLimits.maxW));
+        this.isoParams.distance = [100, 200, 300, 400, 500].sort(function() {return 0.5 - Math.random()})[0];
+        this.isoParams.width = [10, 20, 30, 40, 50].sort(function() {return 0.5 - Math.random()})[0];
+        // this.isoParams.distance = Math.floor(randomAB(this.isoLimits.minD, this.isoLimits.maxD));
+        // this.isoParams.width = Math.floor(randomAB(this.isoLimits.minW, this.isoLimits.maxW));
 
-        $('#sliderDistance').slider('value', this.isoParams.distance);
-        $('#sliderWidth').slider('value', this.isoParams.width);
-
+        // $('#sliderDistance').slider('value', this.isoParams.distance);
+        // $('#sliderWidth').slider('value', this.isoParams.width);
         this.updateISOCircles();
         d3.select('#sliderDistanceValue').text(this.isoParams.distance);
         d3.select('#sliderWidthValue').text(this.isoParams.width);
@@ -550,18 +581,18 @@ var fittsTest = {
         this.data[num] = { data: [], colour: colour };
 
         this.currentDataSet = num;
-// var div = d3
-// .select('#dataSets')
-// .append('div')
-// .attr('id', 'dataSet' + num)
-// .text('Data Set ' + num + ' ')
-// .style('background-color', colour);
+        // var div = d3
+        // .select('#dataSets')
+        // .append('div')
+        // .attr('id', 'dataSet' + num)
+        // .text('Data Set ' + num + ' ')
+        // .style('background-color', colour);
 
         var buttonID = 'removeDataSet' + num;
-// div.append('button')
-// .attr('id', buttonID)
-// .attr('type', 'button')
-// .text('delete!');
+        // div.append('button')
+        // .attr('id', buttonID)
+        // .attr('type', 'button')
+        // .text('delete!');
 
         var that = this;
 
@@ -837,7 +868,7 @@ var fittsTest = {
                 ])
                 .range([histDimension.innerHeight, 0]);
 
-// var throughputRect = throughputGroup.selectAll('rect.cat' + key).data(throughputHistogramData);
+            // var throughputRect = throughputGroup.selectAll('rect.cat' + key).data(throughputHistogramData);
 
             var numDataSets = assSize(that.data);
             var xOffset = (histX.rangeBand() / numDataSets) * dataSetIndex;
@@ -879,31 +910,31 @@ var fittsTest = {
                 .axis()
                 .scale(histY)
                 .ticks(5);
-// throughputGroup.selectAll('g.axis').remove();
+            // throughputGroup.selectAll('g.axis').remove();
 
-// throughputGroup
-// .append('g')
-// .attr('class', 'axis')
-// .attr('transform', 'translate(0,' + histDimension.innerHeight + ')')
-// .call(histXAxis.tickSize(6, 3, 6).orient('bottom'));
+            // throughputGroup
+            // .append('g')
+            // .attr('class', 'axis')
+            // .attr('transform', 'translate(0,' + histDimension.innerHeight + ')')
+            // .call(histXAxis.tickSize(6, 3, 6).orient('bottom'));
 
             // throughputGroup.append("g")
             // .attr("class", "axis")
             // .call(histYAxis.tickSize(-histDimension.innerWidth).orient("left"));
 
-// throughputRect
-// .enter()
-// .append('rect')
-// .attr('class', 'cat' + key)
-// .attr('rx', 2)
-// .attr('ry', 2)
-// .style('fill', colour)
-// .call(makeRect);
+            // throughputRect
+            // .enter()
+            // .append('rect')
+            // .attr('class', 'cat' + key)
+            // .attr('rx', 2)
+            // .attr('ry', 2)
+            // .style('fill', colour)
+            // .call(makeRect);
 
-// throughputRect
-// .transition()
-// .duration(500)
-// .call(makeRect);
+            // throughputRect
+            // .transition()
+            // .duration(500)
+            // .call(makeRect);
 
             // ==================== eff position and speed ===================
             // more or less copy-pasted from above
@@ -927,25 +958,25 @@ var fittsTest = {
                     if (dt > 0) var speed = dist / dt;
                     else var speed = 0;
 
-// positionEffectiveGroup
-// .append('line')
-// .attr('class', 'cat' + key)
-// .attr('x1', effPositionX(last.x + offset))
-// .attr('x2', effPositionX(x + offset))
-// .attr('y1', effPositionY(last.y))
-// .attr('y2', effPositionY(y))
-// .style('stroke', colour)
-// .style('opacity', 0.5);
+                    // positionEffectiveGroup
+                    // .append('line')
+                    // .attr('class', 'cat' + key)
+                    // .attr('x1', effPositionX(last.x + offset))
+                    // .attr('x2', effPositionX(x + offset))
+                    // .attr('y1', effPositionY(last.y))
+                    // .attr('y2', effPositionY(y))
+                    // .style('stroke', colour)
+                    // .style('opacity', 0.5);
 
-// speedEffectiveGroup
-// .append('line')
-// .attr('class', 'cat' + key)
-// .attr('x1', effSpeedX(last.t - A.t))
-// .attr('x2', effSpeedX(p.t - A.t))
-// .attr('y1', effSpeedY(last.v))
-// .attr('y2', effSpeedY(speed))
-// .style('stroke', colour)
-// .style('opacity', 0.5);
+                    // speedEffectiveGroup
+                    // .append('line')
+                    // .attr('class', 'cat' + key)
+                    // .attr('x1', effSpeedX(last.t - A.t))
+                    // .attr('x2', effSpeedX(p.t - A.t))
+                    // .attr('y1', effSpeedY(last.v))
+                    // .attr('y2', effSpeedY(speed))
+                    // .style('stroke', colour)
+                    // .style('opacity', 0.5);
 
                     var last = {};
                     last.x = x;
@@ -1033,7 +1064,7 @@ function project(A, B, p) {
 }
 
 function mouseMoved() {
-var m = d3.svg.mouse(this);
+    var m = d3.svg.mouse(this);
     fittsTest.mouseMoved(m[0], m[1]);
 }
 

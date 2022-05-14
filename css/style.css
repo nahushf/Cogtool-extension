@@ -104,23 +104,30 @@ hr {
     justify-content: space-between;
 }
 
-
-.container_12 .page-header .values-container{
-    display: flex;
-    align-items: center;
-    font-size: 20px;
+.grid_4  .values-container{
     gap: 16px;
-    margin-right: 24px;
 }
 
+.grid_4  .values-header{
+    color: #9b9b9b;
+}
 
-.container_12 .page-header h1{
+.grid_4  h1{
     margin-left: 24px;
 }
 
-.container_12 .page-header .values-container .header-value{
+.grid_4  .values-container .header-value{
     display: flex;
     align-items: center;
+}
+
+
+.grid_4  .values-container .values__values{
+    display: flex;
+    gap: 16px;
+    font-size: 24px;
+    margin-bottom: 24px;
+    font-weight: normal;
 }
 
 div.msg {
