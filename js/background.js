@@ -39,7 +39,7 @@ function setBadge() {
 }
 
 chrome.runtime.onMessage.addListener((request, sender) => {
-    const tabKey = `${sender.tab.id}`;
+    const tabKey = `${sender.tab ? sender.tab.id : request.tabKey}`;
     getState({
         tabKey,
         callback: ({ recordState, thinkTimeFlag, records, constants }) => {
@@ -52,6 +52,12 @@ chrome.runtime.onMessage.addListener((request, sender) => {
                 const { a, b } = request;
                 const constantsKeyVal = constantsKey();
                 chrome.storage.local.set({ [constantsKeyVal]: { a, b } });
+                return;
+            }
+
+            if (request.eventType === EVENT_TYPES.UPDATE_ALL_RECORDS) {
+                const { records } = request;
+                chrome.storage.local.set({ [tabKey]: records });
                 return;
             }
             const recordingFlag = recordState.recording;

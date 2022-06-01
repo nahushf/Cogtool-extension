@@ -1,4 +1,4 @@
-import { EVENT_TYPES, THINK_TIME } from './constants.js';
+import { EVENT_TYPES, THINK_TIME, SYSTEM_RESPONSE_TIME, THINK_RECORD, SYSTEM_RESPONSE_RECORD } from './constants.js';
 
 export class Record {
     record;
@@ -11,8 +11,8 @@ export class Record {
         return `<div class="time">
             <div class="actual"> 
             ${this.record.timeTaken / 1000}s</div>${
-            this.record.expertTime ? `<div class="expert">/${this.record.expertTime.toFixed(2)}s</div>` : ''
-        }</div> `;
+                this.record.expertTime ? `<div class="expert">/${this.record.expertTime.toFixed(2)}s</div>` : ''
+            }</div> `;
     }
 
     renderJSON() {
@@ -28,16 +28,26 @@ export class ThinkRecord extends Record {
     time = THINK_TIME;
 
     constructor(record) {
-        super(record);
+        super(record || THINK_RECORD);
     }
 
     renderHeader() {
         return `<div>Think</div>`;
     }
 
-    render() {
-        return `<div class='record-row-container think-record'><span class="record-row-title">Think</span></div>`;
+}
+
+export class SystemResponseRecord extends Record {
+    time = SYSTEM_RESPONSE_TIME;
+
+    constructor(record) {
+        super(record || SYSTEM_RESPONSE_RECORD);
     }
+
+    renderHeader() {
+        return `<div>System Response</div>`;
+    }
+
 }
 
 export class KeystrokeRecord extends Record {
@@ -50,7 +60,7 @@ export class KeystrokeRecord extends Record {
     }
 
     renderHeader() {
-        return `<div>Tapped on ${this.record.nodeText}</div> `;
+        return `<div>Typed ${this.record.nodeText}</div> `;
     }
 }
 
@@ -78,6 +88,9 @@ export function marshallRecord(record) {
         }
         case EVENT_TYPES.SCROLL: {
             return new ScrollRecord(record);
+        }
+        case EVENT_TYPES.RESPONSE: {
+            return new SystemResponseRecord(record);
         }
     }
 }

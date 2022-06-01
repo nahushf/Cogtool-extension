@@ -25,6 +25,10 @@ textarea {
     padding: 8px;
 }
 
+#disabled-content {
+    padding: 16px;
+}
+
 .logs-header {
     font-size: 16px;
     margin-left: 8px;
@@ -76,12 +80,116 @@ textarea {
     border-bottom: 0px;
 }
 
+#logs .record-drawer-container {
+    margin-top: -8px;
+}
+
+#logs .record-drawer-container:first-child {
+    margin-top: 0px
+}
 
 #logs .record-drawer {
     max-height: 40px;
     transition: max-height 0.2s ease-out;
     overflow: hidden;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #f2f2f2;
+}
+
+#logs .record-drawer__add-step {
+    position: relative;
+    height: 8px;
+    width: 100%;
+    border-radius: 2px;
+    cursor: pointer;
+    background: transparent;
+    transform: translateY(-50%);
+    transition: background 0.2s ease-out;
+}
+
+
+#logs .record-drawer-container .add-step-modal{
+    opacity: 0;
+    position: fixed;
+    background: rgba(0, 0, 0, 0.5);
+    height: 100%;
+    width: 100%;
+    left: 0px;
+    top: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;;
+    transition: opacity 0.2s ease-out;
+}
+
+
+#logs .record-drawer-container .add-step-modal.open{
+    opacity: 1;
+    pointer-events: all;
+    z-index: 9;
+}
+
+#logs .record-drawer-container .add-step-modal .add-step-modal__content{
+    background: white;
+    padding: 24px;
+    transform: translateY(0px);
+    transition: transform 0.2s ease-out;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+#logs .record-drawer-container .add-step-modal .add-step-modal__content .add-step__options{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+#logs .record-drawer-container .add-step-modal.open .add-step-modal__content {
+    transform: translateY(-50px);
+}
+
+#logs .record-drawer__add-step .add-step-popup {
+    padding: 4px;
+    background: #4a4a4a;
+    border-radius: 4px;
+    position: absolute; 
+    top: calc(100% + 5px);
+    left: 50%;
+    opacity: 0;
+    pointer-events: none;
+    color: white;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease-out;
+}
+
+#logs .record-drawer__add-step .add-step-popup::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid #4a4a4a;
+    border-top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#logs .record-drawer-container:last-child .record-drawer__add-step {
+    display: none;
+}
+
+#logs .record-drawer__add-step:hover {
+    background: #f2f2f2;
+}
+
+#logs .record-drawer__add-step:hover .add-step-popup {
+    opacity: 1;
+}
+
+#logs .record-drawer__add-step:active {
+    background: #ccc;
 }
 
 #logs .record-drawer.open {

@@ -63,7 +63,6 @@ var scatterY = d3.scale
     .linear()
     .domain([MAX_TIME, 0])
     .range([0, plotScatterDimension.innerHeight]);
-console.log('miss');
 
 var scaleT = d3.scale
     .linear()
@@ -276,7 +275,6 @@ var fittsTest = {
 
         this.generateISOPositions(this.isoParams.num, this.isoParams.distance, this.isoParams.width);
 
-        console.log(123, this.isoPositions);
         const svgNode = testAreaSVG[0][0];
         const circleNodes = Array.from(svgNode.querySelectorAll('circle.iso'));
         circleNodes.forEach(node => svgNode.removeChild(node));
@@ -378,16 +376,14 @@ var fittsTest = {
                 hit: { x: x, y: y, t: new Date().getTime() }
             });
             this.removeTarget();
-
-            if (this.isoParams.randomize && this.currentCount >= this.isoPositions.length) {
-                console.log(33);
+            if (this.isoParams.randomize && this.currentCount >= this.isoPositions.length - 1) {
                 this.randomizeParams();
                 this.currentCount = 0;
                 this.currentPosition = 0;
                 this.miss = 0;
                 this.updateISOCircles;
                 this.generateTarget();
-                this.active = false;
+// this.active = false;
             } else {
                 this.currentCount++;
                 this.generateTarget();
