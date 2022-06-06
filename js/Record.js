@@ -53,10 +53,6 @@ export class SystemResponseRecord extends Record {
 export class KeystrokeRecord extends Record {
     constructor(record) {
         super(record);
-        /**
-         * Keystroke expert time is calculated as K + P from http://facweb.cs.depaul.edu/cmiller/eval/goms.html
-         */
-        this.record = { ...this.record, expertTime: 0.2 + 1.1 };
     }
 
     renderHeader() {

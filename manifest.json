@@ -1,14 +1,18 @@
 {
     "name": "Cogtool+",
+    "version": "1.0",  
+    "icons": {
+        "32": "icons/icon_32.png"
+    },
+    "description": "This extension logs the steps a user takes to perform a task and estimates the time an expert would take to complete each step.", 
     "manifest_version": 3,
-    "version": "1.0",
-    "options_page": "options.html",
+    "options_page": "regression.html",
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'self'"
+    },
     "background": {
         "service_worker": "js/background.js",
         "type": "module"
-    },
-    "icons": {
-        "32": "icons/icon_32.png"
     },
     "action": {
         "default_popup": "popup.html"
@@ -34,7 +38,6 @@
     "permissions": [
         "downloads",
         "storage",
-        "unlimitedStorage",
         "notifications"
     ],
     "host_permissions":[

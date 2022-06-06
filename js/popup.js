@@ -199,7 +199,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     renderer.setup();
 
     const clearBtn = renderer.clearBtn;
-    const thinkTimeCheckbox = document.querySelector('#think-time-checkbox');
+    // const thinkTimeCheckbox = document.querySelector('#think-time-checkbox');
     const recordingCheckbox = renderer.recordingCheckboxNode;
     const changeConstantsButton = document.querySelector('#change-constants');
 
@@ -255,9 +255,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         });
     };
 
-    thinkTimeCheckbox.addEventListener('change', e => {
-        chrome.storage.local.set({ [thinkTimeKey(tabKey)]: e.target.checked });
-    });
+    // thinkTimeCheckbox.addEventListener('change', e => {
+    // chrome.storage.local.set({ [thinkTimeKey(tabKey)]: e.target.checked });
+    // });
 
     recordingCheckbox.addEventListener('change', ({ target: { checked } }) => {
         setRecordState({
@@ -274,7 +274,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         chrome.runtime.openOptionsPage();
     });
 
-    renderer.getThinkTimeFlag(checked => (thinkTimeCheckbox.checked = checked));
+    // renderer.getThinkTimeFlag(checked => (thinkTimeCheckbox.checked = checked));
 
     renderer.getRecordingFlag(recordingFlag => {
         recordingCheckbox.checked = recordingFlag;

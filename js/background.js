@@ -1,4 +1,4 @@
-import { EVENT_TYPES, THINK_TIME, FITTS_CONSTANT } from './constants.js';
+import { EVENT_TYPES, THINK_TIME, FITTS_CONSTANT, SCROLL_EXPERT_TIME_S, KEYSTROKE_EXPERT_TIME_S } from './constants.js';
 import {
     getState,
     recordKey,
@@ -89,12 +89,15 @@ function marshallRecord(recordData, lastRecord, recordState, constants) {
     centerY = centerY || 0;
     let timeTaken = 0;
     let expertTime = 0;
+    let previousCenterY = 0;
+    let previousCenterX = 0;
     if (lastRecord) {
         timeTaken = ms - (lastRecord?.ms || recordState.timestamp);
-        if (recordData.eventType === EVENT_TYPES.CLICK) {
-            let { centerX: previousCenterX, centerY: previousCenterY } = lastRecord;
-            previousCenterY = previousCenterY || 0;
-            previousCenterX = previousCenterX || 0;
+        previousCenterX = lastRecord.centerX || 0;
+        previousCenterY = lastRecord.previousCenterY || 0;
+    }
+    switch (recordData.eventType) {
+        case EVENT_TYPES.CLICK: {
             const distance = distanceBetweenCoordinates({
                 x1: previousCenterX,
                 x2: centerX,
@@ -107,8 +110,21 @@ function marshallRecord(recordData, lastRecord, recordState, constants) {
                 a: constants.a,
                 b: constants.b
             });
+            break
+        }
+        case EVENT_TYPES.SCROLL: {
+            expertTime = SCROLL_EXPERT_TIME_S;
+            break;
+        }
+        case EVENT_TYPES.KEYSTROKE: {
+            /**
+             * http://facweb.cs.depaul.edu/cmiller/eval/goms.html
+             */
+            expertTime = KEYSTROKE_EXPERT_TIME_S;
+            break;
         }
     }
+
     return {
         ...recordData,
         expertTime,

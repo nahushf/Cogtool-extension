@@ -12,8 +12,11 @@ export const EVENT_TYPES = Object.freeze({
 });
 
 export const THINK_TIME = 1200;
-
+export const SCROLL_EXPERT_TIME_MS = 1100;
+export const SCROLL_EXPERT_TIME_S = SCROLL_EXPERT_TIME_MS / 1000;
 export const SYSTEM_RESPONSE_TIME = 1000;
+export const KEYSTROKE_EXPERT_TIME_MS = 200;
+export const KEYSTROKE_EXPERT_TIME_S = 0.2;
 
 export const RECORDING_OFF_STATE = {
     recording: false,
@@ -36,4 +39,3 @@ export const FITTS_CONSTANT = WITH_MOUSE;
 
 export const THINK_RECORD = { eventType: EVENT_TYPES.THINK, timeTaken: THINK_TIME };
 export const SYSTEM_RESPONSE_RECORD = { eventType: EVENT_TYPES.RESPONSE, timeTaken: SYSTEM_RESPONSE_TIME };
-
