@@ -178,7 +178,9 @@ class Renderer {
                     this.keyOrder = [...this.keyOrder, ...missingKeys];
                 });
                 tabData.forEach(({ record }) => {
-                    tuples.push(this.keyOrder.map(key => `"${record[key]}"`).join(','));
+                    tuples.push(
+                        this.keyOrder.map(key => `"${typeof record[key] === 'undefined' ? '' : record[key]}"`).join(',')
+                    );
                 });
                 callback(this.keyOrder, tuples.join('\n'));
             }

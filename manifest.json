@@ -6,7 +6,7 @@
     },
     "description": "This extension logs the steps a user takes to perform a task and estimates the time an expert would take to complete each step.", 
     "manifest_version": 3,
-    "options_page": "regression.html",
+    "options_page": "options.html",
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'self'"
     },
