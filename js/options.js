@@ -33,7 +33,6 @@ let tClick = 0;
 let xClick = 0;
 let yClick = 0;
 
-const NUMBER_OF_TARGETS = 9;
 experiment(ex);
 
 function setNodeHTML(node, value) {
@@ -71,59 +70,55 @@ chrome.storage.local.onChanged.addListener(changed => {
     setNodeHTML(bCurrentValueNode, b);
 
     setTimeout(() => {
-        alert('Values for a and b updated.');
+        alert('Values for a and b have been updated.');
     }, 0);
 });
 
 function inactive() {
-    if (MT.length > 2) {
-        let lr = linreg(MT, ID);
-        const a = parseFloat(lr.b.toFixed(2));
-        const b = parseFloat(lr.m.toFixed(2));
-        document.getElementById('error1').innerHTML =
-            '<em>MT</em> = ' +
-            a +
-            ' + ' +
-            b +
-            ' <em>ID</em>' +
-            '<br /><em>r</em> = ' +
-            lr.r.toFixed(2) +
-            `<br /> <br />
-            `;
-
-        aStateNode.value = a;
-        bStateNode.value = b;
-        aStateNode.dispatchEvent(new Event('change'));
-        bStateNode.dispatchEvent(new Event('change'));
-        updateButton.disabled = false;
-        while (sp.lastElementChild) sp.removeChild(sp.lastElementChild); // If replotting, clear previous plot first.
+    const n = MT.length;
+    if (n > 2) {
+        let lr = linReg(MT, ID);
+        // If replotting, clear previous plot first.
+        while (sp.lastElementChild) sp.removeChild(sp.lastElementChild);
         plot(sp, ID, MT, lr);
+
+        if ( !isNaN(lr.b) && !isNaN(lr.m) ) {
+            const
+                a = Math.round((lr.b * 100) * (1 + Number.EPSILON)) / 100,
+                b = Math.round((lr.m * 100) * (1 + Number.EPSILON)) / 100,
+                r = Math.round((lr.r * 100) * (1 + Number.EPSILON)) / 100;
+            
+            document.getElementById('results').innerHTML =
+                '<em>MT</em> = ' + a.toFixed(2) + ' + ' + 
+                                   b.toFixed(2) + ' <em>ID</em><br />' +
+                '<em>r</em> = '  + r.toFixed(2) + ', ' +
+                '<em>n</em> = '  + n + '<br />';
+
+            aStateNode.value = a;
+            bStateNode.value = b;
+            aStateNode.dispatchEvent(new Event('change'));
+            bStateNode.dispatchEvent(new Event('change'));
+            updateButton.disabled = false;
+        }
     }
 }
 
 function experiment(ex) {
     let xMid = 0.5 * ex.getAttribute('width');
     let yMid = 0.5 * ex.getAttribute('height');
-    // for (let i = 0; i < num; i++) {
-    // isoPositions[i] = {
-    // x: testDimension.cx + (d / 2) * Math.cos((2 * Math.PI * i) / num),
-    // y: testDimension.cy + (d / 2) * Math.sin((2 * Math.PI * i) / num),
-    // w: w
-    // };
-    // }
 
     let id = 1;
     for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
+        for (let j = 1; j < 4; j++) {
             for (let k = 0; k < 9; k++) {
-                let cx = Math.round(xMid + (50 + j * 50) * Math.cos((8 / 9) * k * Math.PI));
-                let cy = Math.round(yMid + (50 + j * 50) * Math.sin((8 / 9) * k * Math.PI));
+                let cx = Math.round(xMid + (j * xMid/4) * Math.cos((8/9) * k * Math.PI));
+                let cy = Math.round(yMid + (j * yMid/4) * Math.sin((8/9) * k * Math.PI));
                 let circle = document.createElementNS(svgns, 'circle');
                 circle.setAttributeNS(null, 'id', id);
                 circle.setAttributeNS(null, 'display', 'none');
                 circle.setAttributeNS(null, 'cx', cx);
                 circle.setAttributeNS(null, 'cy', cy);
-                circle.setAttributeNS(null, 'r', 10 + 20 * i + (4 * Math.random() - 2));
+                circle.setAttributeNS(null, 'r', xMid/40 + (i * xMid/10) + 4*Math.random());
                 circle.setAttributeNS(null, 'fill', 'rgba(255, 0, 0, 1)');
                 circle.addEventListener('click', e => hit(e));
                 ex.appendChild(circle);
@@ -234,13 +229,15 @@ function plot(sp, x, y, lr) {
         sp.appendChild(circle);
     }
     // regression line
-    let line = document.createElementNS(svgns, 'line');
-    line.setAttributeNS(null, 'x1', leftPad);
-    line.setAttributeNS(null, 'y1', topPad + h - (h * (lr.b + lr.m * xMin - yMin)) / (yMax - yMin));
-    line.setAttributeNS(null, 'x2', leftPad + w);
-    line.setAttributeNS(null, 'y2', topPad + h - (h * (lr.b + lr.m * xMax - yMin)) / (yMax - yMin));
-    line.setAttributeNS(null, 'style', regStyle);
-    sp.appendChild(line);
+    if ( !isNaN(lr.b) && !isNaN(lr.m) ) {
+        let line = document.createElementNS(svgns, 'line');
+        line.setAttributeNS(null, 'x1', leftPad);
+        line.setAttributeNS(null, 'y1', topPad + h - (h * (lr.b + lr.m * xMin - yMin)) / (yMax - yMin));
+        line.setAttributeNS(null, 'x2', leftPad + w);
+        line.setAttributeNS(null, 'y2', topPad + h - (h * (lr.b + lr.m * xMax - yMin)) / (yMax - yMin));
+        line.setAttributeNS(null, 'style', regStyle);
+        sp.appendChild(line);
+    }
 }
 
 // find bounds, positive values only
@@ -263,7 +260,7 @@ function bounds(x) {
 }
 
 // linear regression
-function linreg(y, x) {
+function linReg(y, x) {
     let lr = {};
     let n = y.length;
     let sum_x = 0;
