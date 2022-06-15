@@ -264,7 +264,7 @@ textarea {
 
 
 #recording-checkbox:checked + label::after{
-    content: "Stop Recording";
+    content: "Pause";
 }
 
 #recording-button {
