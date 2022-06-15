@@ -32,7 +32,7 @@ var MT = [],
 let tClick = 0;
 let xClick = 0;
 let yClick = 0;
-('');
+
 const NUMBER_OF_TARGETS = 9;
 experiment(ex);
 
@@ -53,7 +53,7 @@ getGlobalState({
 
 updateButton.addEventListener('click', function() {
     const a = parseFloat(aStateNode.value);
-    const b = parseFloat( bStateNode.value );
+    const b = parseFloat(bStateNode.value);
     chrome.runtime.sendMessage({
         eventType: EVENT_TYPES.SAVE_CONSTANTS,
         a,
@@ -71,7 +71,7 @@ chrome.storage.local.onChanged.addListener(changed => {
     setNodeHTML(bCurrentValueNode, b);
 
     setTimeout(() => {
-        alert('A and B values updated.');
+        alert('Values for a and b updated.');
     }, 0);
 });
 
@@ -95,7 +95,7 @@ function inactive() {
         bStateNode.value = b;
         aStateNode.dispatchEvent(new Event('change'));
         bStateNode.dispatchEvent(new Event('change'));
-        updateButton.disabled =false;
+        updateButton.disabled = false;
         while (sp.lastElementChild) sp.removeChild(sp.lastElementChild); // If replotting, clear previous plot first.
         plot(sp, ID, MT, lr);
     }
@@ -150,7 +150,6 @@ function hit(evt) {
         let difficulty = Math.log2(d / w + 1);
         MT.push(Math.round(interval));
         ID.push(difficulty);
-        // document.getElementById("error1").innerHTML = "hit: MT: "+MT+"<br />ID: "+ID+"<br />d: "+d+"<br /> w: " +w+ "<br /> xClick: "+xClick+ "<br /> cx: "+x;
     }
     tClick = t;
     xClick = x;
@@ -165,7 +164,7 @@ function hit(evt) {
 // scatterplot of x, y on SVG sp with regression line lr
 function plot(sp, x, y, lr) {
     const textStyle = 'font-family: sans-serif; font-size: 10',
-        gridStyle = 'stroke: rgb(220,220,220); stroke-width: 1',
+        gridStyle = 'stroke: rgb(220, 220, 220); stroke-width: 1',
         pointStyle = 'fill: rgba(40, 100, 200, 0.6)',
         regStyle = 'stroke: rgba(40, 100, 200, 0.6); stroke-width: 1.5';
     const leftPad = 30,
