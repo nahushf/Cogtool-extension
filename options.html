@@ -5,11 +5,11 @@
     <body>
         <svg id="experiment" width="400" height="400"></svg>
         <div class="experiment-info">
-            <svg id="scatterplot" width="400" height="400">
-                <text x="50%" y="50%" text-anchor="middle">Keep clicking the red dot fast. Pause to view the data.</text>
+            <svg id="scatterplot" width="400" height="400" viewport="0 0 400 400">
+                <text x="50%" y="50%" text-anchor="middle">Keep clicking the red dot quickly. Pause to view the data.</text>
             </svg>
             <div class="details">
-                <p id="error1"></p>
+                <p id="results"></p>
                 <div class="values-container">
                     <div class="values-section">
                         <div class="values-title">New Values</div>
@@ -19,7 +19,7 @@
                         </div>
                     </div>
                     <div class="values-section">
-                        <div class="values-title">Current Values</div>
+                        <div class="values-title">Currently Used Values</div>
                         <div>
                             <em>a</em> = <span id="a-current-value">pending</span>,
                             <em>b</em> = <span id="b-current-value">pending</span>
