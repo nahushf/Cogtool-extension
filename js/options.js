@@ -25,7 +25,7 @@ bStateNode.addEventListener('change', function(e) {
 ex.setAttribute('height', window.innerHeight);
 ex.setAttribute('width', window.innerHeight);
 const msTimeout = 2000;
-var timeout = setTimeout(inactive, msTimeout);
+var timeout = setTimeout(calculate, msTimeout);
 
 var MT = [],
     ID = [];
@@ -70,11 +70,11 @@ chrome.storage.local.onChanged.addListener(changed => {
     setNodeHTML(bCurrentValueNode, b);
 
     setTimeout(() => {
-        alert('Values for a and b have been updated.');
+        console.log('Values for a and b have been updated.');
     }, 0);
 });
 
-function inactive() {
+function calculate() {
     const n = MT.length;
     if (n > 2) {
         let lr = linReg(MT, ID);
@@ -82,7 +82,7 @@ function inactive() {
         while (sp.lastElementChild) sp.removeChild(sp.lastElementChild);
         plot(sp, ID, MT, lr);
 
-        if ( !isNaN(lr.b) && !isNaN(lr.m) ) {
+        if (!isNaN(lr.m)) {
             const
                 a = Math.round((lr.b * 100) * (1 + Number.EPSILON)) / 100,
                 b = Math.round((lr.m * 100) * (1 + Number.EPSILON)) / 100,
@@ -104,21 +104,24 @@ function inactive() {
 }
 
 function experiment(ex) {
-    let xMid = 0.5 * ex.getAttribute('width');
-    let yMid = 0.5 * ex.getAttribute('height');
+    const w = ex.getAttribute('width');
+    const h = ex.getAttribute('height');
+    const radii = [9*w/80, 3*w/80, w/80];
+    const dist = [w/8, 2*w/8, 3*w/8];
+    const spokes = 9;
 
     let id = 1;
-    for (let i = 0; i < 3; i++) {
-        for (let j = 1; j < 4; j++) {
-            for (let k = 0; k < 9; k++) {
-                let cx = Math.round(xMid + (j * xMid/4) * Math.cos((8/9) * k * Math.PI));
-                let cy = Math.round(yMid + (j * yMid/4) * Math.sin((8/9) * k * Math.PI));
+    for (let i = 0; i < radii.length; i++) {
+        for (let j = 0; j < dist.length; j++) {
+            for (let k = 0; k < spokes; k++) {
+                let cx = Math.round(w/2 + dist[j] * Math.cos(((spokes-1)/spokes) * k * Math.PI));
+                let cy = Math.round(h/2 + dist[j] * Math.sin(((spokes-1)/spokes) * k * Math.PI));
                 let circle = document.createElementNS(svgns, 'circle');
                 circle.setAttributeNS(null, 'id', id);
                 circle.setAttributeNS(null, 'display', 'none');
                 circle.setAttributeNS(null, 'cx', cx);
                 circle.setAttributeNS(null, 'cy', cy);
-                circle.setAttributeNS(null, 'r', xMid/40 + (i * xMid/10) + 4*Math.random());
+                circle.setAttributeNS(null, 'r', radii[i] * (1.0 + 0.2 * Math.random()));
                 circle.setAttributeNS(null, 'fill', 'rgba(255, 0, 0, 1)');
                 circle.addEventListener('click', e => hit(e));
                 ex.appendChild(circle);
@@ -126,12 +129,13 @@ function experiment(ex) {
             }
         }
     }
+    document.getElementById(id-1).setAttribute('fill', 'rgba(0, 192, 0, 1)');
     document.getElementById(1).setAttribute('display', 'block');
 }
 
 function hit(evt) {
     clearTimeout(timeout); // reset 2000 ms user inactivity timer
-    timeout = setTimeout(inactive, msTimeout);
+    timeout = setTimeout(calculate, msTimeout);
 
     let t = evt.timeStamp,
         interval = t - tClick;
@@ -149,11 +153,19 @@ function hit(evt) {
     tClick = t;
     xClick = x;
     yClick = y;
-    let id = circle.getAttribute('id');
+    let id = parseInt(circle.getAttribute('id'));
     circle.setAttribute('display', 'none');
-    let next = document.getElementById(parseInt(id) + 1);
+    let next = document.getElementById(id + 1);
     if (next == null) next = document.getElementById(1);
     next.setAttribute('display', 'block');
+}
+
+function removeOutlier(evt) {
+    let circle = evt.target;
+    let id = parseInt(circle.getAttribute('id'));
+    ID.splice(id, 1);
+    MT.splice(id, 1);
+    calculate();
 }
 
 // scatterplot of x, y on SVG sp with regression line lr
@@ -161,6 +173,7 @@ function plot(sp, x, y, lr) {
     const textStyle = 'font-family: sans-serif; font-size: 10',
         gridStyle = 'stroke: rgb(220, 220, 220); stroke-width: 1',
         pointStyle = 'fill: rgba(40, 100, 200, 0.6)',
+        outlierStyle = 'fill: rgb(255, 140, 0, 0.6)',
         regStyle = 'stroke: rgba(40, 100, 200, 0.6); stroke-width: 1.5';
     const leftPad = 30,
         rightPad = 10,
@@ -225,11 +238,16 @@ function plot(sp, x, y, lr) {
         circle.setAttributeNS(null, 'cx', leftPad + (w * (x[i] - xMin)) / (xMax - xMin));
         circle.setAttributeNS(null, 'cy', topPad + h - (h * (y[i] - yMin)) / (yMax - yMin));
         circle.setAttributeNS(null, 'r', 4);
-        circle.setAttributeNS(null, 'style', pointStyle);
+        if (Math.abs(lr.z[i]) < 2.0) circle.setAttributeNS(null, 'style', pointStyle);
+        else {
+            circle.setAttributeNS(null, 'style', outlierStyle);
+            circle.setAttributeNS(null, 'id', i);
+            circle.addEventListener('click', e => removeOutlier(e));
+        }
         sp.appendChild(circle);
     }
     // regression line
-    if ( !isNaN(lr.b) && !isNaN(lr.m) ) {
+    if (!isNaN(lr.m)) {
         let line = document.createElementNS(svgns, 'line');
         line.setAttributeNS(null, 'x1', leftPad);
         line.setAttributeNS(null, 'y1', topPad + h - (h * (lr.b + lr.m * xMin - yMin)) / (yMax - yMin));
@@ -279,5 +297,12 @@ function linReg(y, x) {
     lr['m'] = (n * sum_xy - sum_x * sum_y) / (n * sum_xx - sum_x * sum_x);
     lr['b'] = (sum_y - lr.m * sum_x) / n;
     lr['r'] = (n * sum_xy - sum_x * sum_y) / Math.sqrt((n * sum_xx - sum_x * sum_x) * (n * sum_yy - sum_y * sum_y));
+
+    const yEst = x.map(x => lr.b + lr.m * x);
+    const e = y.map((v, i) => v - yEst[i]);
+    const sse = e.reduce((a, c) => a + c * c, 0);
+    const sd = Math.sqrt(sse/(n - 2));
+    
+    lr['z'] = e.map(v => v / sd);  
     return lr;
 }
