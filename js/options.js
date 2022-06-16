@@ -37,9 +37,9 @@ experiment(ex);
 
 function setNodeHTML(node, value) {
     if ((typeof value == 'number' && value.toString().includes('.')) || (parseFloat(value) && value.includes('.'))) {
-        value = parseFloat(value).toFixed(2);
+        value = parseFloat(value);
     }
-    node.innerHTML = value;
+    node.innerHTML = value.toFixed(2);
 }
 
 getGlobalState({
