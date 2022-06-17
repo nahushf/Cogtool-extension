@@ -1,8 +1,8 @@
 import { FITTS_CONSTANT, EVENT_TYPES } from './constants.js';
 import { getState, getGlobalState, constantsKey } from './utils.js';
 
-var svgns = 'http://www.w3.org/2000/svg',
-    ex = document.getElementById('experiment'),
+const svgns = 'http://www.w3.org/2000/svg';
+var ex = document.getElementById('experiment'),
     sp = document.getElementById('scatterplot');
 const aStateNode = document.getElementById('a-state');
 const bStateNode = document.getElementById('b-state');
@@ -22,9 +22,13 @@ bStateNode.addEventListener('change', function(e) {
     setNodeHTML(bNewValueNode, b)
 });
 
-ex.setAttribute('height', window.innerHeight);
 ex.setAttribute('width', window.innerHeight);
-const msTimeout = 2000;
+ex.setAttribute('height', window.innerHeight);
+
+sp.setAttribute('height', 0.65 * window.innerHeight);
+sp.setAttribute('width', 0.95 * window.innerHeight);
+
+const msTimeout = 2500;
 var timeout = setTimeout(calculate, msTimeout);
 
 var MT = [],
@@ -36,9 +40,6 @@ let yClick = 0;
 experiment(ex);
 
 function setNodeHTML(node, value) {
-    if ((typeof value == 'number' && value.toString().includes('.')) || (parseFloat(value) && value.includes('.'))) {
-        value = parseFloat(value);
-    }
     node.innerHTML = value.toFixed(2);
 }
 
@@ -90,9 +91,9 @@ function calculate() {
             
             document.getElementById('results').innerHTML =
                 '<em>MT</em> = ' + a.toFixed(2) + ' + ' + 
-                                   b.toFixed(2) + ' <em>ID</em><br />' +
+                                   b.toFixed(2) + ' <em>ID</em>, ' +
                 '<em>r</em> = '  + r.toFixed(2) + ', ' +
-                '<em>n</em> = '  + n + '<br />';
+                '<em>n</em> = '  + n;
 
             aStateNode.value = a;
             bStateNode.value = b;
@@ -106,7 +107,7 @@ function calculate() {
 function experiment(ex) {
     const w = ex.getAttribute('width');
     const h = ex.getAttribute('height');
-    const radii = [9*w/80, 3*w/80, w/80];
+    const radii = [5*w/80, 3*w/80, w/80];
     const dist = [w/8, 2*w/8, 3*w/8];
     const spokes = 9;
 
