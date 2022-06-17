@@ -40,7 +40,7 @@ let yClick = 0;
 experiment(ex);
 
 function setNodeHTML(node, value) {
-    node.innerHTML = value.toFixed(2);
+    node.innerHTML = value;
 }
 
 getGlobalState({
@@ -70,9 +70,11 @@ chrome.storage.local.onChanged.addListener(changed => {
     setNodeHTML(aCurrentValueNode, a);
     setNodeHTML(bCurrentValueNode, b);
 
+    let label = updateButton.innerHTML;
+    updateButton.innerHTML = "Updated";
     setTimeout(() => {
-        console.log('Values for a and b have been updated.');
-    }, 0);
+        updateButton.innerHTML = label;
+    }, 800);
 });
 
 function calculate() {
@@ -85,13 +87,13 @@ function calculate() {
 
         if (!isNaN(lr.m)) {
             const
-                a = Math.round((lr.b * 100) * (1 + Number.EPSILON)) / 100,
-                b = Math.round((lr.m * 100) * (1 + Number.EPSILON)) / 100,
+                a = Math.round((lr.b)),
+                b = Math.round((lr.m)),
                 r = Math.round((lr.r * 100) * (1 + Number.EPSILON)) / 100;
             
             document.getElementById('results').innerHTML =
-                '<em>MT</em> = ' + a.toFixed(2) + ' + ' + 
-                                   b.toFixed(2) + ' <em>ID</em>, ' +
+                '<em>MT</em> = ' + a + ' + ' + 
+                                   b + ' <em>ID</em>, ' +
                 '<em>r</em> = '  + r.toFixed(2) + ', ' +
                 '<em>n</em> = '  + n;
 

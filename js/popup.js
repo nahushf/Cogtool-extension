@@ -87,7 +87,7 @@ class Renderer {
     }
 
     setTotalTime(totalTime) {
-        this.totalTimeNode.innerText = totalTime.toPrecision(4) + 's';
+        this.totalTimeNode.innerHTML = totalTime.toPrecision(4) + 's';
     }
 
     setup() {
@@ -231,7 +231,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
                     type: 'basic',
                     title: 'No actions recorded',
                     iconUrl: 'icons/icon_32.png',
-                    message: `Cannot download csv because no actions were recorded`
+                    message: `Cannot download csv because no actions were recorded.`
                 });
                 return;
             }
@@ -251,9 +251,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
             clipboardAssistTextArea.focus();
             clipboardAssistTextArea.select();
             document.execCommand('copy');
-            let label = copyBtn.innerText;
-            copyBtn.innerText = 'Copied';
-            setTimeout(() => (copyBtn.innerText = label), 800);
+            let label = copyBtn.innerHTML;
+            copyBtn.innerHTML = 'Copied';
+            setTimeout(() => (copyBtn.innerHTML = label), 800);
         });
     };
 
