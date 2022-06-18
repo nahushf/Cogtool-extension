@@ -26,5 +26,5 @@ export const FITTS_CONSTANT = {
     B: 150
 };
 
-export const THINK_RECORD = { eventType: EVENT_TYPES.THINK, expertTime: THINK_TIME };
-export const SYSTEM_RESPONSE_RECORD = { eventType: EVENT_TYPES.RESPONSE, expertTime: SYSTEM_RESPONSE_TIME };
+export const THINK_RECORD = { eventType: EVENT_TYPES.THINK, timeTaken: 0, expertTime: THINK_TIME };
+export const SYSTEM_RESPONSE_RECORD = { eventType: EVENT_TYPES.RESPONSE, timeTaken: 0, expertTime: SYSTEM_RESPONSE_TIME };
