@@ -222,7 +222,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         renderer.setTotalTime(0);
     };
     let exportBtn = document.querySelector('.export-csv');
-    let copyBtn = document.querySelector('.copy-clipboard');
+//    let copyBtn = document.querySelector('.copy-clipboard');
 
     exportBtn.onclick = e => {
         renderer.getCSV((keyOrder, csv) => {
@@ -244,22 +244,18 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         });
     };
 
-    copyBtn.onclick = e => {
-        renderer.getCSV((keyOrder, csv) => {
-            const clipboardAssistTextArea = document.querySelector('#clipboard-assist');
-            clipboardAssistTextArea.value = keyOrder + '\n' + csv;
-            clipboardAssistTextArea.focus();
-            clipboardAssistTextArea.select();
-            document.execCommand('copy');
-            let label = copyBtn.innerHTML;
-            copyBtn.innerHTML = 'Copied';
-            setTimeout(() => (copyBtn.innerHTML = label), 800);
-        });
-    };
-
-    // thinkTimeCheckbox.addEventListener('change', e => {
-    // chrome.storage.local.set({ [thinkTimeKey(tabKey)]: e.target.checked });
-    // });
+//    copyBtn.onclick = e => {
+//        renderer.getCSV((keyOrder, csv) => {
+//            const clipboardAssistTextArea = document.querySelector('#clipboard-assist');
+//            clipboardAssistTextArea.value = keyOrder + '\n' + csv;
+//            clipboardAssistTextArea.focus();
+//            clipboardAssistTextArea.select();
+//            document.execCommand('copy');
+//            let label = copyBtn.innerHTML;
+//            copyBtn.innerHTML = 'Copied';
+//            setTimeout(() => (copyBtn.innerHTML = label), 800);
+//        });
+//    };
 
     recordingCheckbox.addEventListener('change', ({ target: { checked } }) => {
         setRecordState({
@@ -275,8 +271,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     changeConstantsButton.addEventListener('click', () => {
         chrome.runtime.openOptionsPage();
     });
-
-    // renderer.getThinkTimeFlag(checked => (thinkTimeCheckbox.checked = checked));
 
     renderer.getRecordingFlag(recordingFlag => {
         recordingCheckbox.checked = recordingFlag;
