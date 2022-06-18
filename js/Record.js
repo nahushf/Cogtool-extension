@@ -10,8 +10,8 @@ export class Record {
     renderTime() {
         return `<div class="time">
             <div class="actual"> 
-            ${this.record.timeTaken / 1000}s</div>${
-                this.record.expertTime ? `<div class="expert">/${this.record.expertTime.toFixed(2)}s</div>` : ''
+            ${this.record.timeTaken} ms</div>${
+                this.record.expertTime ? `<div class="expert">/${this.record.expertTime} ms</div>` : ''
             }</div> `;
     }
 

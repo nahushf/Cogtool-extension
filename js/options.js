@@ -1,5 +1,5 @@
 import { FITTS_CONSTANT, EVENT_TYPES } from './constants.js';
-import { getState, getGlobalState, constantsKey } from './utils.js';
+import { getState, getGlobalState, constantsKey, roundTo } from './utils.js';
 
 const svgns = 'http://www.w3.org/2000/svg';
 var ex = document.getElementById('experiment'),
@@ -89,7 +89,8 @@ function calculate() {
             const
                 a = Math.round((lr.b)),
                 b = Math.round((lr.m)),
-                r = Math.round((lr.r * 100) * (1 + Number.EPSILON)) / 100;
+                r = roundTo(lr.r, 2);
+                // r = Math.round((lr.r * 100) * (1 + Number.EPSILON)) / 100;
             
             document.getElementById('results').innerHTML =
                 '<em>MT</em> = ' + a + ' + ' + 

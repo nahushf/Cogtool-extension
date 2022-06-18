@@ -113,11 +113,16 @@ export function lineIntersectionOnRect({ width, height, xB, yB, xA, yA }) {
 }
 
 export function calculateExpertTime({ targetSize, distance, a, b }) {
-    return a + b * Math.log2(distance / targetSize + 1);
+    const expertTime = a + b * Math.log2(distance / targetSize + 1);
+    return Math.round(expertTime);
 }
 
 export function distanceBetweenCoordinates({ x1, y1, x2, y2 }) {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
+
+export function roundTo(v, dp) {
+    return Math.round( (v * Math.pow(10, dp)) * (1 + Number.EPSILON)) / Math.pow(10, dp);
 }
 
 export function sendEventMessage({

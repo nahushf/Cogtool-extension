@@ -1,5 +1,5 @@
 import { EVENT_TYPES } from './constants.js';
-import { sendEventMessage } from './utils.js';
+import { sendEventMessage, roundTo } from './utils.js';
 const elementsList = ['BUTTON', 'A', 'SELECT', 'INPUT', 'TEXTAREA', 'DETAILS'];
 
 export function main() {
@@ -36,12 +36,12 @@ export function main() {
                 scrollTime: ms - startTime,
                 classList: scrolledNode.className.split(' '),
                 ms,
-                x,
-                y,
-                width,
-                height,
-                centerX: x + width / 2,
-                centerY: y + height / 2,
+                x: roundTo(x, 2),
+                y: roundTo(y, 2),
+                width: roundTo(width, 2),
+                height: roundTo(height, 2),
+                centerX: roundTo(x + width / 2, 2),
+                centerY: roundTo(y + height / 2, 2),
                 date: dateStr,
                 type,
                 time: time.replace('Z', '')
@@ -68,12 +68,12 @@ export function main() {
         sendEventMessage({
             eventType: EVENT_TYPES.CLICK,
             ms,
-            x,
-            y,
-            width,
-            height,
-            centerX: x + width / 2,
-            centerY: y + height / 2,
+            x: roundTo(x, 2),
+            y: roundTo(y, 2),
+            width: roundTo(width, 2),
+            height: roundTo(height, 2),
+            centerX: roundTo(x + width / 2, 2),
+            centerY: roundTo(y + height / 2, 2),
             nodeText: target.textContent?.trim(),
             type: type.toLowerCase(),
             date,

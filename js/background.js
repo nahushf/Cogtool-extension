@@ -1,4 +1,4 @@
-import { EVENT_TYPES, THINK_TIME, FITTS_CONSTANT, SCROLL_EXPERT_TIME_S, KEYSTROKE_EXPERT_TIME_S } from './constants.js';
+import { EVENT_TYPES, THINK_TIME, FITTS_CONSTANT, SCROLL_EXPERT_TIME, KEYSTROKE_EXPERT_TIME } from './constants.js';
 import {
     getState,
     recordKey,
@@ -110,17 +110,17 @@ function marshallRecord(recordData, lastRecord, recordState, constants) {
                 a: constants.a,
                 b: constants.b
             });
-            break
+            break;
         }
         case EVENT_TYPES.SCROLL: {
-            expertTime = SCROLL_EXPERT_TIME_S;
+            expertTime = SCROLL_EXPERT_TIME;
             break;
         }
         case EVENT_TYPES.KEYSTROKE: {
             /**
              * http://facweb.cs.depaul.edu/cmiller/eval/goms.html
              */
-            expertTime = KEYSTROKE_EXPERT_TIME_S;
+            expertTime = KEYSTROKE_EXPERT_TIME;
             break;
         }
     }

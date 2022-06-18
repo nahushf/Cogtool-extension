@@ -52,7 +52,7 @@ function handleLogClick(e, renderer, tabKey) {
 class Renderer {
     header;
     emptyMessage = `<p class="no-actions">No actions recorded</p>`;
-    keyOrder = ['eventType', 'type', 'nodeText', 'x', 'y', 'height', 'width', 'ms', 'date', 'time'];
+    keyOrder = ['eventType', 'type', 'nodeText', 'x', 'y', 'width', 'height', 'ms', 'date', 'time'];
     storage;
     recordStartTimestamp;
     totalTimeNode = document.querySelector('#total-time .total-time__value');
@@ -87,7 +87,7 @@ class Renderer {
     }
 
     setTotalTime(totalTime) {
-        this.totalTimeNode.innerHTML = totalTime.toPrecision(4) + 's';
+        this.totalTimeNode.innerHTML = totalTime + ' ms';
     }
 
     setup() {
@@ -138,7 +138,7 @@ class Renderer {
             this.container.innerHTML += this.renderRecord(record, index);
             totalTime += record.timeTaken;
         });
-        this.setTotalTime(totalTime / 1000);
+        this.setTotalTime(totalTime);
     }
 
     renderRecord(record, index) {
@@ -155,8 +155,8 @@ class Renderer {
                 <div class="add-step-modal__content">
                     <div class="add-step__title">Choose which step to add</div>
                     <div class="add-step__options">
-                        <button id="add-think-step" >Think(M)</button>
-                        <button id="add-response-step" >System Response(R)</div>
+                        <button id="add-think-step" >Think (M)</button>
+                        <button id="add-response-step" >System Response (R)</div>
                     </div> 
                 </div>
             </div>
