@@ -4,6 +4,7 @@ import { getState, getGlobalState, constantsKey, roundTo } from './utils.js';
 const svgns = 'http://www.w3.org/2000/svg';
 var ex = document.getElementById('experiment'),
     sp = document.getElementById('scatterplot');
+const instructionsNode = document.getElementById('instructions');
 const aStateNode = document.getElementById('a-state');
 const bStateNode = document.getElementById('b-state');
 const aCurrentValueNode = document.getElementById('a-current-value');
@@ -25,7 +26,7 @@ bStateNode.addEventListener('change', function(e) {
 ex.setAttribute('width', window.innerHeight);
 ex.setAttribute('height', window.innerHeight);
 
-sp.setAttribute('height', 0.65 * window.innerHeight);
+sp.setAttribute('height', 0.75 * window.innerHeight);
 sp.setAttribute('width', 0.95 * window.innerHeight);
 
 const msTimeout = 2500;
@@ -33,6 +34,7 @@ var timeout = setTimeout(calculate, msTimeout);
 
 var MT = [],
     ID = [];
+var numTrials;
 let tClick = 0;
 let xClick = 0;
 let yClick = 0;
@@ -133,12 +135,14 @@ function experiment(ex) {
             }
         }
     }
-    document.getElementById(id-1).setAttribute('fill', 'rgba(0, 192, 0, 1)');
+    numTrials = id - 1;
+    document.getElementById(numTrials).setAttribute('fill', 'rgba(0, 192, 0, 1)');    
+    setNodeHTML(instructionsNode, 'Trial 1 of ' + numTrials + '. Keep clicking the red dot quickly.');
     document.getElementById(1).setAttribute('display', 'block');
 }
 
 function hit(evt) {
-    clearTimeout(timeout); // reset 2000 ms user inactivity timer
+    clearTimeout(timeout); // reset user inactivity timer
     timeout = setTimeout(calculate, msTimeout);
 
     let t = evt.timeStamp,
@@ -157,11 +161,13 @@ function hit(evt) {
     tClick = t;
     xClick = x;
     yClick = y;
-    let id = parseInt(circle.getAttribute('id'));
+    let id = parseInt(circle.getAttribute('id')) % numTrials + 1;
     circle.setAttribute('display', 'none');
-    let next = document.getElementById(id + 1);
-    if (next == null) next = document.getElementById(1);
+    let next = document.getElementById(id);
+    // if (next == null) next = document.getElementById(1);
     next.setAttribute('display', 'block');
+    setNodeHTML(instructionsNode, 'Trial ' + id + ' of ' + numTrials + '. Keep clicking the red dot quickly.');
+
 }
 
 function removeOutlier(evt) {
