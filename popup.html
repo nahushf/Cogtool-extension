@@ -6,18 +6,11 @@
         <script type="module" src="js/popup.js"></script>
     </head>
     <body>
-        <!-- <textarea id="logArea" readonly></textarea> -->
         <div id="disabled-content">
             This extension is disabled for this page.
         </div>
         <div id="enabled-content">
-            <div id="log-controls" class="logs-header" >
-<!-- <div class="think-time-checkbox-container"> -->
-<!-- <input id="think-time-checkbox" class="checkbox" type="checkbox"  > -->
-
-<!-- <label class="label" for="think-time-checkbox" >Include Think Time</label> -->
-<!-- </div> -->
-            </div>
+            <div id="log-controls" class="logs-header"></div>
                 <div class="log-table-header">
                     <div class="action-description">Actions</div>
                     <div class="time-header"><div class="actual">Actual</div><div class="expert">/Expert Time</div></div>
@@ -29,13 +22,13 @@
                 </div>
                 <div class="btn-row">
                     <input id="recording-checkbox" type="checkbox"/>
-                    <label id="recording-button" class="record" for="recording-checkbox" > <div class="record-icon"></div></label>
+                    <label id="recording-button" class="record" for="recording-checkbox"><div class="record-icon"></div></label>
                     <button class="clear-board">Clear log</button>
-                    <button class="copy-clipboard">Copy as CSV</button>
+ <!--               <button class="copy-clipboard">Copy as CSV</button> -->
                     <button class="export-csv">Save as CSV</button>
                     <button id="change-constants">Update&nbsp;<em>a</em>&nbsp;and&nbsp;<em>b</em></button>
                 </div>
-                <textarea id="clipboard-assist" ></textarea>
+ <!--           <textarea id="clipboard-assist" ></textarea> -->
         </div>
     </body>
 </html>
