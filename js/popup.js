@@ -1,5 +1,5 @@
-import { EVENT_TYPES, THINK_RECORD, THINK_TIME } from './constants.js';
-import { marshallRecord, SystemResponseRecord, ThinkRecord } from './Record.js';
+import { EVENT_TYPES, THINK_RECORD } from './constants.js';
+import { marshallRecord, SystemResponseRecord } from './Record.js';
 import { getState, setRecordState, thinkTimeKey } from './utils.js';
 
 function handleLogClick(e, renderer, tabKey) {

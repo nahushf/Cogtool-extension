@@ -1,5 +1,5 @@
 import { FITTS_CONSTANT, EVENT_TYPES } from './constants.js';
-import { getState, getGlobalState, constantsKey, roundTo } from './utils.js';
+import { getGlobalState, constantsKey, roundTo } from './utils.js';
 
 const svgns = 'http://www.w3.org/2000/svg';
 var ex = document.getElementById('experiment'),
