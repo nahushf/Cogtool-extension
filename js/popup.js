@@ -155,7 +155,7 @@ class Renderer {
                 <div class="add-step-modal__content">
                     <div class="add-step__title">Choose which step to add</div>
                     <div class="add-step__options">
-                        <button id="add-think-step" >Think (M)</button>
+                        <button id="add-think-step" >Mentally Prepare (M)</button>
                         <button id="add-response-step" >System Response (R)</div>
                     </div> 
                 </div>

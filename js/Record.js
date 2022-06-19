@@ -40,7 +40,7 @@ export class ThinkRecord extends Record {
     }
 
     renderHeader() {
-        return `<div>Think</div>`;
+        return `<div>Mentally Prepare</div>`;
     }
 }
 
