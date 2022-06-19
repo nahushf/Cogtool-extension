@@ -31,5 +31,5 @@ export const FITTS_CONSTANT = {
 export const HOME_EVENTS = [EVENT_TYPES.CLICK, EVENT_TYPES.KEYSTROKE];
 
 export const THINK_RECORD = { eventType: EVENT_TYPES.THINK, timeTaken: 0, expertTime: THINK_TIME };
-export const SYSTEM_RESPONSE_RECORD = { eventType: EVENT_TYPES.RESPONSE, 0: SYSTEM_RESPONSE_TIME, expertTime: SYSTEM_RESPONSE_TIME };
+export const SYSTEM_RESPONSE_RECORD = { eventType: EVENT_TYPES.RESPONSE, timeTaken: 0, expertTime: SYSTEM_RESPONSE_TIME };
 export const HOME_RECORD = { eventType: EVENT_TYPES.HOME, timeTaken: 0, expertTime: HOME_TIME };
