@@ -1,4 +1,12 @@
-import { EVENT_TYPES, THINK_TIME, SYSTEM_RESPONSE_TIME, THINK_RECORD, SYSTEM_RESPONSE_RECORD } from './constants.js';
+import {
+    EVENT_TYPES,
+    THINK_TIME,
+    SYSTEM_RESPONSE_TIME,
+    THINK_RECORD,
+    SYSTEM_RESPONSE_RECORD,
+    HOME_TIME,
+    HOME_RECORD
+} from './constants.js';
 
 export class Record {
     record;
@@ -11,8 +19,8 @@ export class Record {
         return `<div class="time">
             <div class="actual"> 
             ${this.record.timeTaken} ms</div>${
-                this.record.expertTime ? `<div class="expert">/${this.record.expertTime} ms</div>` : ''
-            }</div> `;
+            this.record.expertTime ? `<div class="expert">/${this.record.expertTime} ms</div>` : ''
+        }</div> `;
     }
 
     renderJSON() {
@@ -34,7 +42,18 @@ export class ThinkRecord extends Record {
     renderHeader() {
         return `<div>Think</div>`;
     }
+}
 
+export class HomeRecord extends Record {
+    time = HOME_TIME;
+
+    constructor(record) {
+        super(record || HOME_RECORD);
+    }
+
+    renderHeader() {
+        return `<div>Home</div>`;
+    }
 }
 
 export class SystemResponseRecord extends Record {
@@ -47,7 +66,6 @@ export class SystemResponseRecord extends Record {
     renderHeader() {
         return `<div>System Response</div>`;
     }
-
 }
 
 export class KeystrokeRecord extends Record {
@@ -87,6 +105,9 @@ export function marshallRecord(record) {
         }
         case EVENT_TYPES.RESPONSE: {
             return new SystemResponseRecord(record);
+        }
+        case EVENT_TYPES.HOME: {
+            return new HomeRecord(record);
         }
     }
 }

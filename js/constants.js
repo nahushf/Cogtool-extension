@@ -8,6 +8,7 @@ export const EVENT_TYPES = Object.freeze({
     SCROLL: 'scroll',
     SAVE_CONSTANTS: 'save-constants',
     RESPONSE: 'system-response',
+    HOME: 'home',
     UPDATE_ALL_RECORDS: 'update-all-records'
 });
 
@@ -15,6 +16,7 @@ export const THINK_TIME = 1200;
 export const SCROLL_EXPERT_TIME = 1100;
 export const SYSTEM_RESPONSE_TIME = 1000;
 export const KEYSTROKE_EXPERT_TIME = 200;
+export const HOME_TIME = 400;
 
 export const RECORDING_OFF_STATE = {
     recording: false,
@@ -26,5 +28,8 @@ export const FITTS_CONSTANT = {
     B: 150
 };
 
-export const THINK_RECORD = { eventType: EVENT_TYPES.THINK, timeTaken: 0, expertTime: THINK_TIME };
-export const SYSTEM_RESPONSE_RECORD = { eventType: EVENT_TYPES.RESPONSE, timeTaken: 0, expertTime: SYSTEM_RESPONSE_TIME };
+export const HOME_EVENTS = [EVENT_TYPES.CLICK, EVENT_TYPES.KEYSTROKE];
+
+export const THINK_RECORD = { eventType: EVENT_TYPES.THINK, timeTaken: THINK_TIME, expertTime: THINK_TIME };
+export const SYSTEM_RESPONSE_RECORD = { eventType: EVENT_TYPES.RESPONSE, timeTaken: SYSTEM_RESPONSE_TIME, expertTime: SYSTEM_RESPONSE_TIME };
+export const HOME_RECORD = { eventType: EVENT_TYPES.HOME, timeTaken: HOME_TIME, expertTime: HOME_TIME };

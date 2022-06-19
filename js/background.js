@@ -1,4 +1,12 @@
-import { EVENT_TYPES, THINK_TIME, FITTS_CONSTANT, SCROLL_EXPERT_TIME, KEYSTROKE_EXPERT_TIME } from './constants.js';
+import {
+    EVENT_TYPES,
+    THINK_TIME,
+    FITTS_CONSTANT,
+    SCROLL_EXPERT_TIME,
+    KEYSTROKE_EXPERT_TIME,
+    HOME_EVENTS,
+    HOME_RECORD
+} from './constants.js';
 import {
     getState,
     recordKey,
@@ -70,6 +78,14 @@ chrome.runtime.onMessage.addListener((request, sender) => {
             const lastRecord = records[records.length - 1];
             const record = marshallRecord(request.data, lastRecord, recordState, constants);
             const { eventType, time, type, nodeText } = record;
+            if (
+                lastRecord &&
+                lastRecord.eventType !== record.eventType &&
+                HOME_EVENTS.includes(lastRecord.eventType) &&
+                HOME_EVENTS.includes(record.eventType)
+            ) {
+                records.push(HOME_RECORD);
+            }
             records.push(record);
             chrome.notifications.create(eventType + time, {
                 type: 'basic',
