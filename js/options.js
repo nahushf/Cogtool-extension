@@ -27,7 +27,7 @@ ex.setAttribute('width', window.innerHeight);
 ex.setAttribute('height', window.innerHeight);
 
 sp.setAttribute('height', 0.75 * window.innerHeight);
-sp.setAttribute('width', 0.95 * window.innerHeight);
+sp.setAttribute('width', 0.90 * window.innerHeight);
 
 const msTimeout = 2500;
 var timeout = setTimeout(calculate, msTimeout);
@@ -136,9 +136,9 @@ function experiment(ex) {
         }
     }
     numTrials = id - 1;
-    document.getElementById(numTrials).setAttribute('fill', 'rgba(0, 192, 0, 1)');    
-    setNodeHTML(instructionsNode, 'Trial 1 of ' + numTrials + '. Keep clicking the red dot quickly.');
-    document.getElementById(1).setAttribute('display', 'block');
+    document.getElementById(1).setAttribute('fill', 'rgba(0, 192, 0, 1)');    
+    setNodeHTML(instructionsNode, numTrials + ' trials. Keep clicking the dot quickly.');
+    document.getElementById(numTrials).setAttribute('display', 'block');
 }
 
 function hit(evt) {
@@ -166,7 +166,7 @@ function hit(evt) {
     let next = document.getElementById(id);
     // if (next == null) next = document.getElementById(1);
     next.setAttribute('display', 'block');
-    setNodeHTML(instructionsNode, 'Trial ' + id + ' of ' + numTrials + '. Keep clicking the red dot quickly.');
+    setNodeHTML(instructionsNode, 'Trial ' + id + ' of ' + numTrials + '. Keep clicking the dot quickly.');
 
 }
 
