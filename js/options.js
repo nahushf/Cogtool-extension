@@ -23,14 +23,16 @@ bStateNode.addEventListener('change', function(e) {
     setNodeHTML(bNewValueNode, b)
 });
 
-ex.setAttribute('width', window.innerHeight);
-ex.setAttribute('height', window.innerHeight);
+function resizeSVGs() {
+    const side = Math.max(Math.min(window.innerWidth / 2, window.innerHeight), 400);
+    ex.setAttribute('width', side);
+    ex.setAttribute('height', side);
+    sp.setAttribute('width', Math.max(window.innerWidth / 2, 400));
+    sp.setAttribute('height', side - 120);
+    calculate();
+}
 
-sp.setAttribute('height', 0.75 * window.innerHeight);
-sp.setAttribute('width', 0.90 * window.innerHeight);
-
-const msTimeout = 2500;
-var timeout = setTimeout(calculate, msTimeout);
+window.addEventListener('resize', resizeSVGs);
 
 var MT = [],
     ID = [];
@@ -39,7 +41,12 @@ let tClick = 0;
 let xClick = 0;
 let yClick = 0;
 
+resizeSVGs();
+
 experiment(ex);
+
+const msTimeout = 2500;
+var timeout = setTimeout(calculate, msTimeout);
 
 function setNodeHTML(node, value) {
     node.innerHTML = value;
@@ -167,7 +174,6 @@ function hit(evt) {
     // if (next == null) next = document.getElementById(1);
     next.setAttribute('display', 'block');
     setNodeHTML(instructionsNode, 'Trial ' + id + ' of ' + numTrials + '. Keep clicking the dot quickly.');
-
 }
 
 function removeOutlier(evt) {
