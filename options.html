@@ -1,40 +1,48 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <link href="css/options.css" rel="stylesheet"/>
-    </head>
-    <body>
-        <svg id="experiment" width="400" height="400">
-            <text id="instructions" x="50%" y="95%" text-anchor="middle"></text>
+  <head>
+    <title>Options: Fitts' Law</title>
+    <link href="css/options.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="side-by-side">
+      <svg id="experiment">
+        <text id="instructions" x="50%" y="95%" text-anchor="middle"></text>
+      </svg>
+      <div class="vertical-line"></div>
+      <div class="experiment-info">
+        <svg id="scatterplot">
+          <text x="50%" y="50%" text-anchor="middle">
+            The data will be graphed here.
+          </text>
         </svg>
-        <div class="experiment-info">
-            <svg id="scatterplot" width="400" height="400">
-                <text x="50%" y="50%" text-anchor="middle">The data will be graphed here.</text>
-            </svg>
-            <div class="details">
-                <p id="results"><em>MT</em> = <em>a</em> + <em>b ID</em></p>
-                <div class="values-container">
-                    <div class="values-section">
-                        <div class="values-title">New Values</div>
-                        <div>
-                            <em>a</em> = <span id="a-new-value">pending</span>,
-                            <em>b</em> = <span id="b-new-value">pending</span>
-                        </div>
-                    </div>
-                    <div class="values-section">
-                        <div class="values-title">Currently Used Values</div>
-                        <div>
-                            <em>a</em> = <span id="a-current-value">pending</span>,
-                            <em>b</em> = <span id="b-current-value">pending</span>
-                        </div>
-                    </div>
-                </div>
-                <input type="hidden" id="a-state" />
-                <input type="hidden" id="b-state" />
-                <button id="update-values" disabled="true" >Update <em>a</em> and <em>b</em></button>
+        <div class="details">
+          <p id="results"><em>MT</em> = <em>a</em> + <em>b ID</em></p>
+          <div class="values-container">
+            <div class="values-section">
+              <div class="values-title">New Values</div>
+              <div>
+                <em>a</em> = <span id="a-new-value">pending</span>, <em>b</em> =
+                <span id="b-new-value">pending</span>
+              </div>
             </div>
+            <div class="values-section">
+              <div class="values-title">Currently Used Values</div>
+              <div>
+                <em>a</em> = <span id="a-current-value">pending</span>,
+                <em>b</em> = <span id="b-current-value">pending</span>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="a-state" />
+          <input type="hidden" id="b-state" />
+          <button id="update-values" disabled="true">
+            Update <em>a</em> and <em>b</em>
+          </button>
         </div>
+      </div>
+    </div>
 
-        <script src="js/options.js" type="module"></script>
-    </body>
+    <script src="js/options.js" type="module"></script>
+  </body>
 </html>
