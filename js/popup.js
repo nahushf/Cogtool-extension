@@ -58,17 +58,20 @@ class Renderer {
     totalTimeNode = document.querySelector('#total-time .total-time__value');
     recordingCheckboxNode = document.querySelector('#recording-checkbox');
     clearBtn = document.querySelector('.clear-board');
+    pageNumberNode = document.querySelector('#page-number');
+    recordsPerPage = 20;
+    timer;
     constructor(container, storage, tabKey) {
         this.container = container;
         this.storage = storage;
         this.tabKey = tabKey;
         this.header = this.keyOrder.join(', ');
+        this.setPageNumber(0)
     }
 
     _getRecords(callback) {
         return this.storage.get(this.tabKey, data => {
             const tabData = data[this.tabKey] || [];
-            console.log(tabData);
             callback(tabData.map(record => marshallRecord(record)));
         });
     }
@@ -93,7 +96,17 @@ class Renderer {
     setup() {
         document.querySelector('#logs').addEventListener('click', e => handleLogClick(e, this, this.tabKey));
         chrome.action.setBadgeBackgroundColor({ color: '#D2042D' });
-        this.fetchAndRenderRecords();
+        this.addPage();
+        this.container.addEventListener('scroll', this.handleContainerScroll.bind(this));
+    }
+
+    handleContainerScroll() {
+        const { scrollHeight, clientHeight, scrollTop } = this.container;
+
+        const maxScrollTop = scrollHeight - clientHeight - 100;
+        if (scrollTop > maxScrollTop) {
+            this.addPage();
+        }
     }
 
     getThinkTimeFlag(callback) {
@@ -118,50 +131,83 @@ class Renderer {
         });
     }
 
-    fetchAndRenderRecords() {
+    getPageRecords(records, pageNumber) {
+        const startIndex = (pageNumber - 1) * this.recordsPerPage;
+        return records.slice(startIndex, startIndex + this.recordsPerPage);
+    }
+
+    addPage() {
         getState({
             tabKey: this.tabKey,
             callback: ({ records, thinkTimeFlag, recordState }) => {
-                console.log(records);
-                this.renderRecords(records);
+                if (!records.length) {
+                    this.container.innerHTML = this.emptyMessage;
+                    return;
+                }
+                const currentPageNumber = this.getPageNumber();
+                const newPageNumber = currentPageNumber+1;
+                if ((currentPageNumber*this.recordsPerPage) >= records.length) {
+                    return 
+                }
+                this.setPageNumber(newPageNumber);
+                const pageRecords = this.getPageRecords(records, newPageNumber);
+                this.appendRecords(pageRecords);
             }
         });
     }
 
-    renderRecords(records) {
-        if (!records.length) {
-            this.container.innerHTML = this.emptyMessage;
-            return;
-        }
+    addPageV2(allRecords, currentPageNumber, newPageNumber) {
+        const pageRecords = this.getPageRecords(allRecords, newPageNumber);
+        this.appendRecords(pageRecords);
+    }
+
+    getPageNumber() {
+        return parseInt( this.pageNumberNode.value );
+    }
+
+    setPageNumber(pageNumber) {
+        this.pageNumberNode.value = pageNumber;
+        this.pageNumberNode.dispatchEvent(new Event('change'));
+    }
+
+    appendRecords(records) {
         let totalTime = 0;
+
+        const documentFragment = document.createDocumentFragment();
         records.forEach((record, index) => {
-            this.container.innerHTML += this.renderRecord(record, index);
-            totalTime += record.timeTaken;
+            const recordNode = new DOMParser()
+                .parseFromString(this.renderRecord(record, index), 'text/html')
+                .firstChild.querySelector('.record-drawer-container');
+            documentFragment.append(recordNode);
         });
+        this.container.append(documentFragment);
         this.setTotalTime(totalTime);
     }
 
     renderRecord(record, index) {
         const recordInstance = marshallRecord(record);
         return `<div class="record-drawer-container" data-record-index="${index}">
-            <div class="record-drawer">
-            <div class="drawer-toggle" >${recordInstance.renderHeader()}${recordInstance.renderTime()}</div>
-            <div class="drawer-content">${recordInstance.renderJSON()}</div>
-            </div>
-            <div class="record-drawer__add-step">
-                <div class="add-step-popup" >Click to add step</div>
-            </div> 
-            <div class="add-step-modal">
-                <div class="add-step-modal__content">
-                    <div class="add-step__title">Choose which step to add</div>
-                    <div class="add-step__options">
-                        <button id="add-think-step" >Mentally Prepare (M)</button>
-                        <button id="add-response-step" >System Response (R)</div>
+                    <div class="record-drawer">
+                        <div class="drawer-toggle" >${recordInstance.renderHeader()}${recordInstance.renderTime()}</div>
+                        <div class="drawer-content">${recordInstance.renderJSON()}</div>
+                    </div>
+                    <div class="record-drawer__add-step">
+                        <div class="add-step-popup" >Click to add step</div>
                     </div> 
+                    <div class="add-step-modal">
+                        <div class="add-step-modal__content">
+                            <div class="add-step__title">Choose which step to add</div>
+                            <div class="add-step__options">
+                                <button id="add-think-step" >Mentally Prepare (M)</button>
+                                <button id="add-response-step" >System Response (R)</button>
+                            </div> 
+                        </div>
+                    </div>
                 </div>
-            </div>
-            </div>
-            `;
+            `
+            .split('\n')
+            .map(line => line.trim())
+            .join('');
     }
 
     getCSV(callback) {
@@ -212,6 +258,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     if (optionsUrl === tabs[0].url || !tabs[0].url) {
         enabledControls.style.display = 'none';
         disabledContent.style.display = 'block';
+        return;
     } else {
         enabledControls.style.display = 'block';
         disabledContent.style.display = 'none';
@@ -222,7 +269,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         renderer.setTotalTime(0);
     };
     let exportBtn = document.querySelector('.export-csv');
-//    let copyBtn = document.querySelector('.copy-clipboard');
+    //    let copyBtn = document.querySelector('.copy-clipboard');
 
     exportBtn.onclick = e => {
         renderer.getCSV((keyOrder, csv) => {
@@ -244,18 +291,18 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         });
     };
 
-//    copyBtn.onclick = e => {
-//        renderer.getCSV((keyOrder, csv) => {
-//            const clipboardAssistTextArea = document.querySelector('#clipboard-assist');
-//            clipboardAssistTextArea.value = keyOrder + '\n' + csv;
-//            clipboardAssistTextArea.focus();
-//            clipboardAssistTextArea.select();
-//            document.execCommand('copy');
-//            let label = copyBtn.innerHTML;
-//            copyBtn.innerHTML = 'Copied';
-//            setTimeout(() => (copyBtn.innerHTML = label), 800);
-//        });
-//    };
+    //    copyBtn.onclick = e => {
+    //        renderer.getCSV((keyOrder, csv) => {
+    //            const clipboardAssistTextArea = document.querySelector('#clipboard-assist');
+    //            clipboardAssistTextArea.value = keyOrder + '\n' + csv;
+    //            clipboardAssistTextArea.focus();
+    //            clipboardAssistTextArea.select();
+    //            document.execCommand('copy');
+    //            let label = copyBtn.innerHTML;
+    //            copyBtn.innerHTML = 'Copied';
+    //            setTimeout(() => (copyBtn.innerHTML = label), 800);
+    //        });
+    //    };
 
     recordingCheckbox.addEventListener('change', ({ target: { checked } }) => {
         setRecordState({
