@@ -23,14 +23,16 @@ bStateNode.addEventListener('change', function(e) {
     setNodeHTML(bNewValueNode, b)
 });
 
-ex.setAttribute('width', window.innerHeight);
-ex.setAttribute('height', window.innerHeight);
+function resizeSVGs() {
+    const side = Math.max(Math.min(window.innerWidth / 2, window.innerHeight), 400);
+    ex.setAttribute('width', side);
+    ex.setAttribute('height', side);
+    sp.setAttribute('width', Math.max(window.innerWidth / 2, 400));
+    sp.setAttribute('height', side - 120);
+    calculate();
+}
 
-sp.setAttribute('height', 0.75 * window.innerHeight);
-sp.setAttribute('width', 0.90 * window.innerHeight);
-
-const msTimeout = 2500;
-var timeout = setTimeout(calculate, msTimeout);
+window.addEventListener('resize', resizeSVGs);
 
 var MT = [],
     ID = [];
@@ -39,7 +41,12 @@ let tClick = 0;
 let xClick = 0;
 let yClick = 0;
 
+resizeSVGs();
+
 experiment(ex);
+
+const msTimeout = 2500;
+var timeout = setTimeout(calculate, msTimeout);
 
 function setNodeHTML(node, value) {
     node.innerHTML = value;
@@ -82,15 +89,15 @@ chrome.storage.local.onChanged.addListener(changed => {
 function calculate() {
     const n = MT.length;
     if (n > 2) {
-        let lr = linReg(MT, ID);
+        const lr = linReg(MT, ID);
         // If replotting, clear previous plot first.
         while (sp.lastElementChild) sp.removeChild(sp.lastElementChild);
         plot(sp, ID, MT, lr);
 
-        if (!isNaN(lr.m)) {
+        if (lr.m != null) {
             const
-                a = Math.round((lr.b)),
-                b = Math.round((lr.m)),
+                a = Math.round(lr.b),
+                b = Math.round(lr.m),
                 r = roundTo(lr.r, 2);
                 // r = Math.round((lr.r * 100) * (1 + Number.EPSILON)) / 100;
             
@@ -167,7 +174,6 @@ function hit(evt) {
     // if (next == null) next = document.getElementById(1);
     next.setAttribute('display', 'block');
     setNodeHTML(instructionsNode, 'Trial ' + id + ' of ' + numTrials + '. Keep clicking the dot quickly.');
-
 }
 
 function removeOutlier(evt) {
@@ -257,7 +263,7 @@ function plot(sp, x, y, lr) {
         sp.appendChild(circle);
     }
     // regression line
-    if (!isNaN(lr.m)) {
+    if (lr.m != null) {
         let line = document.createElementNS(svgns, 'line');
         line.setAttributeNS(null, 'x1', leftPad);
         line.setAttributeNS(null, 'y1', topPad + h - (h * (lr.b + lr.m * xMin - yMin)) / (yMax - yMin));
@@ -270,27 +276,29 @@ function plot(sp, x, y, lr) {
 
 // find bounds, positive values only
 function bounds(x) {
-    let b = {},
-        max = Math.max(...x),
-        min = Math.min(...x),
-        range = max - min,
-        j = 0.5;
+    const b = {};
+    const max = Math.max(...x);
+    const min = Math.min(...x);
+    const range = max - min;
+    let j = 0.5;
     for (let i = 1; 20 < range / j; i += 1) {
         if (i % 3 != 0) j = 2 * j;
         else j = 2.5 * j;
     }
     let lb = 0;
-    for (var ub = 0; ub < max; ub += j) if (ub < min) lb = ub;
-    b['lb'] = lb;
-    b['ub'] = ub;
-    b['by'] = j;
+    let ub = 0;
+    for (; ub < max; ub += j) if (ub < min) lb = ub;
+    b.lb = lb;
+    b.ub = ub;
+    b.by = j;
     return b;
 }
 
 // linear regression
 function linReg(y, x) {
-    let lr = {};
-    let n = y.length;
+    const n = y.length;
+    if (n < 2) return null;
+    const lr = {};
     let sum_x = 0;
     let sum_y = 0;
     let sum_xy = 0;
@@ -304,15 +312,18 @@ function linReg(y, x) {
         sum_yy += y[i] * y[i];
     }
     // slope, y-intercept, correlation coefficient
-    lr['m'] = (n * sum_xy - sum_x * sum_y) / (n * sum_xx - sum_x * sum_x);
-    lr['b'] = (sum_y - lr.m * sum_x) / n;
-    lr['r'] = (n * sum_xy - sum_x * sum_y) / Math.sqrt((n * sum_xx - sum_x * sum_x) * (n * sum_yy - sum_y * sum_y));
+    const run = n * sum_xx - sum_x * sum_x;
+    if (run === 0) return null;
+    const rise = n * sum_xy - sum_x * sum_y;
+    lr.m = rise / run;
+    lr.b = (sum_y - lr.m * sum_x) / n;
+    lr.r = rise / Math.sqrt(run * (n * sum_yy - sum_y * sum_y));
 
+    // standardized residuals for outlier detection
     const yEst = x.map(x => lr.b + lr.m * x);
     const e = y.map((v, i) => v - yEst[i]);
     const sse = e.reduce((a, c) => a + c * c, 0);
     const sd = Math.sqrt(sse/(n - 2));
-    
-    lr['z'] = e.map(v => v / sd);  
+    lr.z = e.map(v => v / sd);
     return lr;
 }
