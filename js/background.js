@@ -78,10 +78,10 @@ chrome.runtime.onMessage.addListener((request, sender) => {
             const record = marshallRecord(request.data, lastRecord, recordState, constants);
             const { eventType, time, type, nodeText } = record;
             if (
-                lastRecord &&
-                lastRecord.eventType !== record.eventType &&
-                HOME_EVENTS.includes(lastRecord.eventType) &&
-                HOME_EVENTS.includes(record.eventType)
+                !lastRecord ||
+                (lastRecord.eventType !== record.eventType &&
+                    HOME_EVENTS.includes(lastRecord.eventType) &&
+                    HOME_EVENTS.includes(record.eventType))
             ) {
                 records.push(HOME_RECORD);
             }
