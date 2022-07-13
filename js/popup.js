@@ -59,6 +59,7 @@ class Renderer {
     recordingCheckboxNode = document.querySelector('#recording-checkbox');
     clearBtn = document.querySelector('.clear-board');
     pageNumberNode = document.querySelector('#page-number');
+    totalTimeStateNode = document.querySelector('#total-time-state');
     recordsPerPage = 20;
     timer;
     constructor(container, storage, tabKey) {
@@ -66,7 +67,7 @@ class Renderer {
         this.storage = storage;
         this.tabKey = tabKey;
         this.header = this.keyOrder.join(', ');
-        this.setPageNumber(0)
+        this.setPageNumber(0);
     }
 
     _getRecords(callback) {
@@ -89,15 +90,44 @@ class Renderer {
         });
     }
 
+    getTotalTime(callback) {
+        getState({
+            tabKey: this.tabKey,
+            callback: ({ records, thinkTimeFlag, recordState }) => {
+                if (!records.length) {
+                    return;
+                }
+                let totalTime = 0;
+                records.forEach(record => {
+                    totalTime += record.timeTaken;
+                });
+                callback(totalTime);
+            }
+        });
+    }
+
     setTotalTime(totalTime) {
+        this.totalTimeStateNode.value = totalTime;
+        this.totalTimeStateNode.dispatchEvent(new Event('change'));
+    }
+
+    renderTotalTime(totalTime) {
         this.totalTimeNode.innerHTML = totalTime + ' ms';
     }
 
     setup() {
+        const self = this;
         document.querySelector('#logs').addEventListener('click', e => handleLogClick(e, this, this.tabKey));
         chrome.action.setBadgeBackgroundColor({ color: '#D2042D' });
         this.addPage();
+        this.getTotalTime(function(totalTime) {
+            self.setTotalTime(totalTime);
+        });
         this.container.addEventListener('scroll', this.handleContainerScroll.bind(this));
+        this.totalTimeStateNode.addEventListener('change', function(e) {
+            const time = parseFloat(e.target.value) || 0;
+            self.renderTotalTime(time);
+        });
     }
 
     handleContainerScroll() {
@@ -145,9 +175,9 @@ class Renderer {
                     return;
                 }
                 const currentPageNumber = this.getPageNumber();
-                const newPageNumber = currentPageNumber+1;
-                if ((currentPageNumber*this.recordsPerPage) >= records.length) {
-                    return 
+                const newPageNumber = currentPageNumber + 1;
+                if (currentPageNumber * this.recordsPerPage >= records.length) {
+                    return;
                 }
                 this.setPageNumber(newPageNumber);
                 const pageRecords = this.getPageRecords(records, newPageNumber);
@@ -162,7 +192,7 @@ class Renderer {
     }
 
     getPageNumber() {
-        return parseInt( this.pageNumberNode.value );
+        return parseInt(this.pageNumberNode.value);
     }
 
     setPageNumber(pageNumber) {
@@ -171,7 +201,7 @@ class Renderer {
     }
 
     appendRecords(records) {
-        let totalTime = 0;
+        // let totalTime = 0;
 
         const documentFragment = document.createDocumentFragment();
         records.forEach((record, index) => {
@@ -181,7 +211,7 @@ class Renderer {
             documentFragment.append(recordNode);
         });
         this.container.append(documentFragment);
-        this.setTotalTime(totalTime);
+        // this.setTotalTime(totalTime);
     }
 
     renderRecord(record, index) {
@@ -266,7 +296,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
     clearBtn.onclick = () => {
         renderer.clear();
-        renderer.setTotalTime(0);
+        renderer.renderTotalTime(0);
     };
     let exportBtn = document.querySelector('.export-csv');
     //    let copyBtn = document.querySelector('.copy-clipboard');

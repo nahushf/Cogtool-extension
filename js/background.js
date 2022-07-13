@@ -83,7 +83,7 @@ chrome.runtime.onMessage.addListener((request, sender) => {
                     HOME_EVENTS.includes(lastRecord.eventType) &&
                     HOME_EVENTS.includes(record.eventType))
             ) {
-                records.push(HOME_RECORD);
+                records.push({...HOME_RECORD, ms: lastRecord?.ms || recordState.timestamp});
             }
             records.push(record);
             chrome.notifications.create(eventType + time, {
@@ -106,8 +106,8 @@ function marshallRecord(recordData, lastRecord, recordState, constants) {
     let expertTime = 0;
     let previousCenterY = 0;
     let previousCenterX = 0;
+    timeTaken = ms - (lastRecord?.ms || recordState.timestamp);
     if (lastRecord) {
-        timeTaken = ms - (lastRecord?.ms || recordState.timestamp);
         previousCenterX = lastRecord.centerX || 0;
         previousCenterY = lastRecord.previousCenterY || 0;
     }
