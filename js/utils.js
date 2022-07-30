@@ -1,8 +1,4 @@
-import { RECORDING_OFF_STATE, FITTS_CONSTANT } from './constants.js';
-
-export function thinkTimeKey(tabKey) {
-    return `${tabKey}-think-time`;
-}
+import { RECORDING_OFF_STATE, FITTS_CONSTANT, THINK_TIME, HOME_TIME, SYSTEM_RESPONSE_TIME } from './constants.js';
 
 export function recordKey(tabKey) {
     return `${tabKey}-recording`;
@@ -20,21 +16,18 @@ export function setRecordState({ tabKey, storage = defaultStorage, recording, ti
 
 export function getState({ storage = defaultStorage, callback, tabKey }) {
     const recordKeyVal = recordKey(tabKey);
-    const thinkTimeKeyVal = thinkTimeKey(tabKey);
     const constantsKeyVal = constantsKey();
     storage.get(
         {
             [tabKey]: [],
             [recordKeyVal]: RECORDING_OFF_STATE,
-            [thinkTimeKeyVal]: false,
             [constantsKeyVal]: { a: FITTS_CONSTANT.A, b: FITTS_CONSTANT.B }
         },
         data => {
             const recordState = data[recordKeyVal];
-            const thinkTimeFlag = data[thinkTimeKeyVal];
             const records = data[tabKey];
             const constants = data[constantsKeyVal];
-            callback({ recordState, thinkTimeFlag, records, constants });
+            callback({ recordState, records, constants });
         }
     );
 }
@@ -42,7 +35,7 @@ export function getState({ storage = defaultStorage, callback, tabKey }) {
 export function getGlobalState({ storage = defaultStorage, callback }) {
     storage.get(null, data => {
         callback(data);
-    })
+    });
 }
 
 export function calculateExpertTime({ targetSize, distance, a, b }) {
@@ -55,7 +48,7 @@ export function distanceBetweenCoordinates({ x1, y1, x2, y2 }) {
 }
 
 export function roundTo(v, dp) {
-    return Math.round( (v * Math.pow(10, dp)) * (1 + Number.EPSILON)) / Math.pow(10, dp);
+    return Math.round(v * Math.pow(10, dp) * (1 + Number.EPSILON)) / Math.pow(10, dp);
 }
 
 export function sendEventMessage({
@@ -92,4 +85,23 @@ export function sendEventMessage({
             ...remainingData
         }
     });
+}
+
+export function getSettings(state) {
+    const settingsState = state.settings || {};
+    if (!settingsState.thinkTime) {
+        settingsState.thinkTime = THINK_TIME;
+    }
+
+    if (!settingsState.homeTime) {
+        settingsState.homeTime = HOME_TIME;
+    }
+
+    if (!settingsState.systemResponseTime) {
+        settingsState.systemResponseTime = SYSTEM_RESPONSE_TIME;
+    }
+
+    state.settings = settingsState;
+
+    return state;
 }

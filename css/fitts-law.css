@@ -1,0 +1,60 @@
+body {
+  margin: 0px;
+  align-items: top;
+}
+
+.side-by-side {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+}
+
+#experiment {
+  min-height: 400px;
+  height: min(50vw, 100vh);
+  max-height: min(50vw, 100vh);
+  min-width: 400px;
+  width: min(50vw, 100vh);
+  max-width: min(50vw, 100vh);
+  margin: 0 auto;
+}
+
+.vertical-line {
+  background-color: lightgray;
+  min-height: 100vh;
+}
+
+.experiment-info {
+  min-height: 400px;
+  height: min(50vw, 100vh);
+  max-height: min(50vw, 100vh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+}
+
+#scatterplot {
+  min-width: 400px;
+  width: 50vw;
+  height: max(min(50vw, 100vh), 400px);
+  margin: 0 auto;
+}
+
+.details {
+  min-height: 120px;
+  height: 120px;
+  max-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#results {
+  margin: 8px 0px;
+}
+
+.values-container {
+  display: flex;
+  margin: 8px 0px;
+  gap: 32px;
+}

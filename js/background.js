@@ -9,16 +9,17 @@ import {
 import {
     getState,
     recordKey,
-    thinkTimeKey,
     calculateExpertTime,
     distanceBetweenCoordinates,
-    constantsKey
+    constantsKey,
+    getGlobalState,
+    getSettings
 } from './utils.js';
 chrome.runtime.onStartup.addListener(() => chrome.storage.local.clear());
 
 chrome.tabs.onRemoved.addListener(tabId => {
     chrome.storage.local.get(data => {
-        const keys = [tabId, thinkTimeKey(tabId), recordKey(tabId)];
+        const keys = [tabId, /*thinkTimeKey(tabId),*/ recordKey(tabId)];
         for (let key of keys) {
             if (data.hasOwnProperty(key)) {
                 chrome.storage.local.remove(key);
@@ -50,49 +51,55 @@ chrome.runtime.onMessage.addListener((request, sender) => {
     getState({
         tabKey,
         callback: ({ recordState, thinkTimeFlag, records, constants }) => {
-            if (request.startup) {
-                setBadge();
-                return;
-            }
+            getGlobalState({
+                storage: chrome.storage.sync,
+                callback: function(permanentData) {
+                    const settings = getSettings(permanentData).settings;
+                    if (request.startup) {
+                        setBadge();
+                        return;
+                    }
 
-            if (request.eventType === EVENT_TYPES.SAVE_CONSTANTS) {
-                const { a, b } = request;
-                const constantsKeyVal = constantsKey();
-                chrome.storage.local.set({ [constantsKeyVal]: { a, b } });
-                return;
-            }
+                    if (request.eventType === EVENT_TYPES.SAVE_CONSTANTS) {
+                        const { a, b } = request;
+                        const constantsKeyVal = constantsKey();
+                        chrome.storage.local.set({ [constantsKeyVal]: { a, b } });
+                        return;
+                    }
 
-            if (request.eventType === EVENT_TYPES.UPDATE_ALL_RECORDS) {
-                const { records } = request;
-                chrome.storage.local.set({ [tabKey]: records });
-                return;
-            }
-            const recordingFlag = recordState.recording;
-            if (!recordingFlag) {
-                return;
-            }
-            if (thinkTimeFlag) {
-                records.push({ eventType: EVENT_TYPES.THINK, timeTaken: THINK_TIME });
-            }
-            const lastRecord = records[records.length - 1];
-            const record = marshallRecord(request.data, lastRecord, recordState, constants);
-            const { eventType, time, type, nodeText } = record;
-            if (
-                !lastRecord ||
-                (lastRecord.eventType !== record.eventType &&
-                    HOME_EVENTS.includes(lastRecord.eventType) &&
-                    HOME_EVENTS.includes(record.eventType))
-            ) {
-                records.push({...HOME_RECORD, ms: lastRecord?.ms || recordState.timestamp});
-            }
-            records.push(record);
-            chrome.notifications.create(eventType + time, {
-                type: 'basic',
-                title: 'Event Logged',
-                iconUrl: 'icons/icon_32.png',
-                message: `${eventType} event on a <${type}> tag ${nodeText ? ` with text "${nodeText}"` : ''}`
+                    if (request.eventType === EVENT_TYPES.UPDATE_ALL_RECORDS) {
+                        const { records } = request;
+                        chrome.storage.local.set({ [tabKey]: records });
+                        return;
+                    }
+                    const recordingFlag = recordState.recording;
+                    if (!recordingFlag) {
+                        return;
+                    }
+                    if (thinkTimeFlag) {
+                        records.push({ eventType: EVENT_TYPES.THINK, timeTaken: THINK_TIME });
+                    }
+                    const lastRecord = records[records.length - 1];
+                    const record = marshallRecord(request.data, lastRecord, recordState, constants);
+                    const { eventType, time, type, nodeText } = record;
+                    if (
+                        !lastRecord ||
+                        (lastRecord.eventType !== record.eventType &&
+                            HOME_EVENTS.includes(lastRecord.eventType) &&
+                            HOME_EVENTS.includes(record.eventType))
+                    ) {
+                        records.push({ ...HOME_RECORD, ms: lastRecord?.ms || recordState.timestamp, expertTime: settings.homeTime });
+                    }
+                    records.push(record);
+                    chrome.notifications.create(eventType + time, {
+                        type: 'basic',
+                        title: 'Event Logged',
+                        iconUrl: 'icons/icon_32.png',
+                        message: `${eventType} event on a <${type}> tag ${nodeText ? ` with text "${nodeText}"` : ''}`
+                    });
+                    chrome.storage.local.set({ [tabKey]: records });
+                }
             });
-            chrome.storage.local.set({ [tabKey]: records });
         }
     });
     return true;

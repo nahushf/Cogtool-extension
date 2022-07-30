@@ -1,6 +1,6 @@
 import { EVENT_TYPES, THINK_RECORD } from './constants.js';
 import { marshallRecord, SystemResponseRecord } from './Record.js';
-import { getState, setRecordState, thinkTimeKey } from './utils.js';
+import { getGlobalState, getState, setRecordState, getSettings } from './utils.js';
 
 function handleLogClick(e, renderer, tabKey) {
     const { target } = e;
@@ -28,21 +28,34 @@ function handleLogClick(e, renderer, tabKey) {
         if (target.tagName === 'BUTTON') {
             const targetID = target.getAttribute('id');
             const addIndex = parseInt(containerNode.getAttribute('data-record-index')) + 1;
-            let newRecord;
-            if (targetID === 'add-think-step') {
-                newRecord = THINK_RECORD;
-            } else if (targetID === 'add-response-step') {
-                newRecord = new SystemResponseRecord().record;
-            }
-            getState({
-                tabKey,
-                callback: ({ records }) => {
-                    const beforeArr = records.slice(0, addIndex);
-                    const afterArr = records.slice(addIndex);
-                    const newArr = [...beforeArr, newRecord, ...afterArr];
-                    chrome.runtime.sendMessage({ eventType: EVENT_TYPES.UPDATE_ALL_RECORDS, tabKey, records: newArr });
-                    renderer.container.innerHTML = null;
-                    renderer.renderRecords(newArr);
+            getGlobalState({
+                callback(data) {
+                    getGlobalState({
+                        storage: chrome.storage.sync,
+                        callback: function(syncData) {
+                            const settings = getSettings(syncData).settings;
+                            let newRecord;
+                            if (targetID === 'add-think-step') {
+                                newRecord = { ...THINK_RECORD, expertTime: settings.thinkTime };
+                            } else if (targetID === 'add-response-step') {
+                                newRecord = { ...new SystemResponseRecord().record, expertTime: settings.systemResponseTime };
+                            }
+                            const records = data[tabKey];
+                            const beforeArr = records.slice(0, addIndex);
+                            const afterArr = records.slice(addIndex);
+                            const newArr = [...beforeArr, newRecord, ...afterArr];
+                            chrome.runtime.sendMessage({
+                                eventType: EVENT_TYPES.UPDATE_ALL_RECORDS,
+                                tabKey,
+                                records: newArr
+                            });
+                            const newRecordNode = new DOMParser()
+                                .parseFromString(renderer.renderRecord(newRecord, addIndex), 'text/html')
+                                .querySelector('.record-drawer-container');
+                            renderer.container.insertBefore(newRecordNode, renderer.container.children[addIndex]);
+                            modalChild.classList.remove('open');
+                        }
+                    });
                 }
             });
         }
@@ -93,7 +106,7 @@ class Renderer {
     getTotalTime(callback) {
         getState({
             tabKey: this.tabKey,
-            callback: ({ records, thinkTimeFlag, recordState }) => {
+            callback: ({ records, recordState }) => {
                 if (!records.length) {
                     return;
                 }
@@ -139,13 +152,6 @@ class Renderer {
         }
     }
 
-    getThinkTimeFlag(callback) {
-        this.storage.get(thinkTimeKey(this.tabKey), data => {
-            const thinkTimeFlag = !!data[thinkTimeKey(this.tabKey)];
-            callback(thinkTimeFlag);
-        });
-    }
-
     getRecordingFlag(callback) {
         getState({
             tabKey: this.tabKey,
@@ -169,7 +175,7 @@ class Renderer {
     addPage() {
         getState({
             tabKey: this.tabKey,
-            callback: ({ records, thinkTimeFlag, recordState }) => {
+            callback: ({ records, recordState }) => {
                 if (!records.length) {
                     this.container.innerHTML = this.emptyMessage;
                     return;
@@ -277,7 +283,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     renderer.setup();
 
     const clearBtn = renderer.clearBtn;
-    // const thinkTimeCheckbox = document.querySelector('#think-time-checkbox');
     const recordingCheckbox = renderer.recordingCheckboxNode;
     const changeConstantsButton = document.querySelector('#change-constants');
 

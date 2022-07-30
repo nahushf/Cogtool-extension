@@ -1,11 +1,11 @@
 import {
     EVENT_TYPES,
-    THINK_TIME,
+    HOME_RECORD,
+    HOME_TIME,
+    SYSTEM_RESPONSE_RECORD,
     SYSTEM_RESPONSE_TIME,
     THINK_RECORD,
-    SYSTEM_RESPONSE_RECORD,
-    HOME_TIME,
-    HOME_RECORD
+    THINK_TIME
 } from './constants.js';
 
 export class Record {

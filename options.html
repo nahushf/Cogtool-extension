@@ -1,48 +1,48 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Options: Fitts' Law</title>
-    <link href="css/options.css" rel="stylesheet" />
-  </head>
-  <body>
-    <div class="side-by-side">
-      <svg id="experiment">
-        <text id="instructions" x="50%" y="95%" text-anchor="middle"></text>
-      </svg>
-      <div class="vertical-line"></div>
-      <div class="experiment-info">
-        <svg id="scatterplot">
-          <text x="50%" y="50%" text-anchor="middle">
-            The data will be graphed here.
-          </text>
-        </svg>
-        <div class="details">
-          <p id="results"><em>MT</em> = <em>a</em> + <em>b ID</em></p>
-          <div class="values-container">
-            <div class="values-section">
-              <div class="values-title">New Values</div>
-              <div>
-                <em>a</em> = <span id="a-new-value">pending</span>, <em>b</em> =
-                <span id="b-new-value">pending</span>
-              </div>
-            </div>
-            <div class="values-section">
-              <div class="values-title">Currently Used Values</div>
-              <div>
-                <em>a</em> = <span id="a-current-value">pending</span>,
-                <em>b</em> = <span id="b-current-value">pending</span>
-              </div>
-            </div>
-          </div>
-          <input type="hidden" id="a-state" />
-          <input type="hidden" id="b-state" />
-          <button id="update-values" disabled="true">
-            Update <em>a</em> and <em>b</em>
-          </button>
-        </div>
-      </div>
-    </div>
+    <head>
+        <title>Options: Novice Expert</title>
+        <link href="css/options.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- A, B,
+            THINK_TIME = 1200;
+            SCROLL_EXPERT_TIME = 1100;
+            SYSTEM_RESPONSE_TIME = 1000;
+            KEYSTROKE_EXPERT_TIME = 200;
+            HOME_TIME = 400;
+        -->
+        <h1 id="page-title"></h1>
+        <fieldset class="a-b-container">
+            <legend>A & B Values</legend>
+            <div class="a-b-values">
+                <div id="a-value" class="value-container" >
+                    <div class="value-label" >A: </div>
+                    <div class="value-value" ></div>
+                </div>
 
-    <script src="js/options.js" type="module"></script>
-  </body>
+                    <div id="b-value" class="value-container" >
+                        <div class="value-label" >B: </div>
+                        <div class="value-value" ></div>
+                    </div>
+            </div>
+            <a class="change-constants-link" href="../fitts-law.html" >Change A, B</a>
+        </fieldset>
+        <fieldset id="think-time-section"  class="value-container think-time">
+            <legend>Think Time</legend>
+            <input type="number" class="value-input" />
+            <button>Save</button>
+        </fieldset>
+        <fieldset id="home-time-section" class="value-container think-time">
+            <legend>Home Time</legend>
+            <input type="number" class="value-input" />
+            <button>Save</button>
+        </fieldset>
+        <fieldset id="system-response-time-section" class="value-container think-time">
+            <legend>System Response Time</legend>
+            <input type="number" class="value-input" />
+            <button>Save</button>
+        </fieldset>
+        <script src="js/options.js" type="module"></script>
+    </body>
 </html>
