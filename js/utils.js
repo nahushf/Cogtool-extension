@@ -89,15 +89,15 @@ export function sendEventMessage({
 
 export function getSettings(state) {
     const settingsState = state.settings || {};
-    if (!settingsState.thinkTime) {
+    if ([null, void 0].includes(settingsState.thinkTime)) {
         settingsState.thinkTime = THINK_TIME;
     }
 
-    if (!settingsState.homeTime) {
+    if ([null, void 0].includes(settingsState.homeTime)) {
         settingsState.homeTime = HOME_TIME;
     }
 
-    if (!settingsState.systemResponseTime) {
+    if ([null, void 0].includes(settingsState.systemResponseTime)) {
         settingsState.systemResponseTime = SYSTEM_RESPONSE_TIME;
     }
 

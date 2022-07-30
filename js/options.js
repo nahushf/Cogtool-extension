@@ -15,7 +15,9 @@ const ABValueClass = 'value-value';
 function addSaveListener(sectionNode, defaultValue, key, completeState) {
     const saveButton = sectionNode.querySelector('button');
     saveButton.addEventListener('click', function() {
-        const newValue = parseFloat(sectionNode.querySelector('.value-input').value) || defaultValue;
+        const nodeValue = sectionNode.querySelector('.value-input').value;
+        let newValue = [null, void 0].includes(nodeValue) ? defaultValue : parseFloat(nodeValue);
+        newValue = isNaN(newValue) ? defaultValue : newValue;
         completeState.settings[key] = newValue;
         chrome.storage.sync.set(completeState, function () {
             saveButton.innerHTML = 'Saved!!';
