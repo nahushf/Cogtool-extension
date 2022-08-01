@@ -58,3 +58,19 @@ body {
   margin: 8px 0px;
   gap: 32px;
 }
+
+button {
+  background: darkgray;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 6px 24px;
+  color: white;
+  width: max-content;
+  border-radius: 4px;
+  text-decoration: none;
+  border: 0px;
+  cursor: pointer;
+  width: 180px;
+  text-align: center;
+  transition: background 0.2s ease-in-out, width 0.2s ease-in-out;
+}
