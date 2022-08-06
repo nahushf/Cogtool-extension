@@ -62,8 +62,9 @@ chrome.runtime.onMessage.addListener((request, sender) => {
 
                     if (request.eventType === EVENT_TYPES.SAVE_CONSTANTS) {
                         const { a, b } = request;
-                        const constantsKeyVal = constantsKey();
-                        chrome.storage.local.set({ [constantsKeyVal]: { a, b } });
+                        permanentData.settings.a = a;
+                        permanentData.settings.b = b;
+                        chrome.storage.sync.set(permanentData);
                         return;
                     }
 
@@ -80,7 +81,7 @@ chrome.runtime.onMessage.addListener((request, sender) => {
                         records.push({ eventType: EVENT_TYPES.THINK, timeTaken: THINK_TIME });
                     }
                     const lastRecord = records[records.length - 1];
-                    const record = marshallRecord(request.data, lastRecord, recordState, constants);
+                    const record = marshallRecord(request.data, lastRecord, recordState, getSettings(permanentData).settings);
                     const { eventType, time, type, nodeText } = record;
                     if (
                         !lastRecord ||

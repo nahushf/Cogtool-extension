@@ -15,12 +15,12 @@ const updateButton = document.getElementById('update-values');
 
 aStateNode.addEventListener('change', function(e) {
     const a = parseFloat(e.target.value);
-    setNodeHTML(aNewValueNode, a)
+    setNodeHTML(aNewValueNode, a);
 });
 
 bStateNode.addEventListener('change', function(e) {
     const b = parseFloat(e.target.value);
-    setNodeHTML(bNewValueNode, b)
+    setNodeHTML(bNewValueNode, b);
 });
 
 function resizeSVGs() {
@@ -70,17 +70,16 @@ updateButton.addEventListener('click', function() {
     });
 });
 
-chrome.storage.local.onChanged.addListener(changed => {
-    const constantsKeyVal = constantsKey();
+chrome.storage.sync.onChanged.addListener(changed => {
     const {
         newValue: { a, b }
-    } = changed[constantsKeyVal];
+    } = changed.settings;
 
     setNodeHTML(aCurrentValueNode, a);
     setNodeHTML(bCurrentValueNode, b);
 
     let label = updateButton.innerHTML;
-    updateButton.innerHTML = "Updated";
+    updateButton.innerHTML = 'Updated';
     setTimeout(() => {
         updateButton.innerHTML = label;
     }, 800);
@@ -95,17 +94,22 @@ function calculate() {
         plot(sp, ID, MT, lr);
 
         if (lr.m != null) {
-            const
-                a = Math.round(lr.b),
+            const a = Math.round(lr.b),
                 b = Math.round(lr.m),
                 r = roundTo(lr.r, 2);
-                // r = Math.round((lr.r * 100) * (1 + Number.EPSILON)) / 100;
-            
+            // r = Math.round((lr.r * 100) * (1 + Number.EPSILON)) / 100;
+
             document.getElementById('results').innerHTML =
-                '<em>MT</em> = ' + a + ' + ' + 
-                                   b + ' <em>ID</em>, ' +
-                '<em>r</em> = '  + r.toFixed(2) + ', ' +
-                '<em>n</em> = '  + n;
+                '<em>MT</em> = ' +
+                a +
+                ' + ' +
+                b +
+                ' <em>ID</em>, ' +
+                '<em>r</em> = ' +
+                r.toFixed(2) +
+                ', ' +
+                '<em>n</em> = ' +
+                n;
 
             aStateNode.value = a;
             bStateNode.value = b;
@@ -119,16 +123,16 @@ function calculate() {
 function experiment(ex) {
     const w = ex.getAttribute('width');
     const h = ex.getAttribute('height');
-    const radii = [5*w/80, 3*w/80, w/80];
-    const dist = [w/8, 2*w/8, 3*w/8];
+    const radii = [(5 * w) / 80, (3 * w) / 80, w / 80];
+    const dist = [w / 8, (2 * w) / 8, (3 * w) / 8];
     const spokes = 9;
 
     let id = 1;
     for (let i = 0; i < radii.length; i++) {
         for (let j = 0; j < dist.length; j++) {
             for (let k = 0; k < spokes; k++) {
-                let cx = Math.round(w/2 + dist[j] * Math.cos(((spokes-1)/spokes) * k * Math.PI));
-                let cy = Math.round(h/2 + dist[j] * Math.sin(((spokes-1)/spokes) * k * Math.PI));
+                let cx = Math.round(w / 2 + dist[j] * Math.cos(((spokes - 1) / spokes) * k * Math.PI));
+                let cy = Math.round(h / 2 + dist[j] * Math.sin(((spokes - 1) / spokes) * k * Math.PI));
                 let circle = document.createElementNS(svgns, 'circle');
                 circle.setAttributeNS(null, 'id', id);
                 circle.setAttributeNS(null, 'display', 'none');
@@ -143,7 +147,7 @@ function experiment(ex) {
         }
     }
     numTrials = id - 1;
-    document.getElementById(1).setAttribute('fill', 'rgba(0, 192, 0, 1)');    
+    document.getElementById(1).setAttribute('fill', 'rgba(0, 192, 0, 1)');
     setNodeHTML(instructionsNode, numTrials + ' trials. Keep clicking the dot quickly.');
     document.getElementById(numTrials).setAttribute('display', 'block');
 }
@@ -168,7 +172,7 @@ function hit(evt) {
     tClick = t;
     xClick = x;
     yClick = y;
-    let id = parseInt(circle.getAttribute('id')) % numTrials + 1;
+    let id = (parseInt(circle.getAttribute('id')) % numTrials) + 1;
     circle.setAttribute('display', 'none');
     let next = document.getElementById(id);
     // if (next == null) next = document.getElementById(1);
@@ -323,7 +327,7 @@ function linReg(y, x) {
     const yEst = x.map(x => lr.b + lr.m * x);
     const e = y.map((v, i) => v - yEst[i]);
     const sse = e.reduce((a, c) => a + c * c, 0);
-    const sd = Math.sqrt(sse/(n - 2));
+    const sd = Math.sqrt(sse / (n - 2));
     lr.z = e.map(v => v / sd);
     return lr;
 }

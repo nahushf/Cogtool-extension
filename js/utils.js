@@ -90,12 +90,12 @@ export function sendEventMessage({
 export function getSettings(state) {
     const settingsState = state.settings || {};
 
-    if ([null, void 0].includes(settingsState.aTime)) {
-        settingsState.aTime = FITTS_CONSTANT.A;
+    if ([null, void 0].includes(settingsState.a)) {
+        settingsState.a = FITTS_CONSTANT.A;
     }
 
-    if ([null, void 0].includes(settingsState.bTime)) {
-        settingsState.bTime = FITTS_CONSTANT.B;
+    if ([null, void 0].includes(settingsState.b)) {
+        settingsState.b = FITTS_CONSTANT.B;
     }
 
     if ([null, void 0].includes(settingsState.thinkTime)) {
