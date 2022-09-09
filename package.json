@@ -10,6 +10,7 @@
     "source": [
         "popup.html",
         "options.html",
+        "fitts-law.html",
         "scripts/background.ts",
         "scripts/contentScript.ts"
     ],
