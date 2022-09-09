@@ -1,12 +1,12 @@
-import { THINK_TIME, HOME_TIME, FITTS_CONSTANT, SYSTEM_RESPONSE_TIME } from './constants.js';
-import { getGlobalState, constantsKey, getSettings } from './utils.js';
+import { THINK_TIME, HOME_TIME, FITTS_CONSTANT, SYSTEM_RESPONSE_TIME } from './constants';
+import { getGlobalState, constantsKey, getSettings } from './utils';
 
 const aSection = document.querySelector('#a-time-section');
 const bSection = document.querySelector('#b-time-section');
 const thinkTimeSection = document.querySelector('#think-time-section');
 const homeTimeSection = document.querySelector('#home-time-section');
 const systemResponseTimeSection = document.querySelector('#system-response-time-section');
-
+const controlsSection = document.querySelector("#controls");
 const titleNode = document.querySelector('#page-title');
 titleNode.innerHTML = chrome.runtime.getManifest().name + ' Options';
 
@@ -15,7 +15,8 @@ const BValueContainerNode = document.querySelector('#b-value');
 const ABValueClass = 'value-value';
 
 function addSaveListener(sectionNode, defaultValue, key, completeState) {
-    const saveButton = systemResponseTimeSection.querySelector('button');
+    const saveButton = controlsSection.querySelector('button');
+    console.log(saveButton)
     saveButton.addEventListener('click', function() {
         const nodeValue = sectionNode.querySelector('.value-input').value;
         let newValue = [null, void 0].includes(nodeValue) ? defaultValue : parseFloat(nodeValue);
@@ -25,7 +26,7 @@ function addSaveListener(sectionNode, defaultValue, key, completeState) {
             saveButton.innerHTML = 'Updated';
             saveButton.classList.add('success');
             setTimeout(function() {
-                saveButton.innerHTML = 'Update';
+                saveButton.innerHTML = 'Update Values';
 
                 saveButton.classList.remove('success');
             }, 1000);

@@ -1,8 +1,9 @@
-import { EVENT_TYPES, THINK_RECORD } from './constants.js';
-import { marshallRecord, SystemResponseRecord } from './Record.js';
-import { getGlobalState, getState, setRecordState, getSettings } from './utils.js';
+import { EVENT_TYPES, THINK_RECORD } from './constants';
+import { marshallRecord, SystemResponseRecord } from './Record';
+import { getGlobalState, getState, setRecordState, getSettings } from './utils';
 
 function handleLogClick(e, renderer, tabKey) {
+    console.log(123123123123123);
     const { target } = e;
     const containerNode = target.closest('.record-drawer-container');
     const recordDrawerNode = target.closest('.record-drawer');
@@ -70,12 +71,14 @@ class Renderer {
     recordStartTimestamp;
     totalTimeNode = document.querySelector('#total-time .total-time__value');
     recordingCheckboxNode = document.querySelector('#recording-checkbox');
-    clearBtn = document.querySelector('.clear-board');
-    pageNumberNode = document.querySelector('#page-number');
-    totalTimeStateNode = document.querySelector('#total-time-state');
+    clearBtn = document.querySelector('.clear-board') as HTMLButtonElement;
+    pageNumberNode = document.querySelector('#page-number') as HTMLInputElement;
+    totalTimeStateNode = document.querySelector('#total-time-state') as HTMLInputElement;
     recordsPerPage = 20;
     timer;
-    constructor(container, storage, tabKey) {
+    container;
+    tabKey
+    constructor(container: Element, storage: chrome.storage.LocalStorageArea, tabKey: string) {
         this.container = container;
         this.storage = storage;
         this.tabKey = tabKey;
@@ -90,7 +93,7 @@ class Renderer {
         });
     }
 
-    _setValue(value, callback) {
+    _setValue(value, callback = () => {}) {
         this.storage.set({ [this.tabKey]: value }, callback);
     }
 
@@ -138,7 +141,7 @@ class Renderer {
         });
         this.container.addEventListener('scroll', this.handleContainerScroll.bind(this));
         this.totalTimeStateNode.addEventListener('change', function(e) {
-            const time = parseFloat(e.target.value) || 0;
+            const time = parseFloat(( e.target as HTMLInputElement ).value) || 0;
             self.renderTotalTime(time);
         });
     }
@@ -211,9 +214,9 @@ class Renderer {
 
         const documentFragment = document.createDocumentFragment();
         records.forEach((record, index) => {
-            const recordNode = new DOMParser()
+            const recordNode = ( new DOMParser()
                 .parseFromString(this.renderRecord(record, index), 'text/html')
-                .firstChild.querySelector('.record-drawer-container');
+                .firstChild as HTMLDivElement).querySelector('.record-drawer-container');
             documentFragment.append(recordNode);
         });
         this.container.append(documentFragment);
@@ -279,11 +282,11 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 
     const logsContainer = document.querySelector('#logs');
     const renderer = new Renderer(logsContainer, chrome.storage.local, tabKey);
-    renderjson.set_icons('+', '-');
+    // renderjson.set_icons('+', '-');
     renderer.setup();
 
     const clearBtn = renderer.clearBtn;
-    const recordingCheckbox = renderer.recordingCheckboxNode;
+    const recordingCheckbox = renderer.recordingCheckboxNode as HTMLInputElement;
     const changeConstantsButton = document.querySelector('#change-constants');
 
     const optionsUrl = chrome.runtime.getURL('/options.html');
@@ -303,7 +306,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         renderer.clear();
         renderer.renderTotalTime(0);
     };
-    let exportBtn = document.querySelector('.export-csv');
+    let exportBtn = document.querySelector('.export-csv') as HTMLButtonElement;
     //    let copyBtn = document.querySelector('.copy-clipboard');
 
     exportBtn.onclick = e => {
@@ -339,7 +342,8 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     //        });
     //    };
 
-    recordingCheckbox.addEventListener('change', ({ target: { checked } }) => {
+    recordingCheckbox.addEventListener('change', ({ target  }) => {
+        const {checked} = <HTMLInputElement>target;
         setRecordState({
             tabKey,
             storage: chrome.storage.local,

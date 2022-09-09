@@ -5,7 +5,7 @@ import {
     KEYSTROKE_EXPERT_TIME,
     HOME_EVENTS,
     HOME_RECORD
-} from './constants.js';
+} from './constants';
 import {
     getState,
     recordKey,
@@ -14,7 +14,7 @@ import {
     constantsKey,
     getGlobalState,
     getSettings
-} from './utils.js';
+} from './utils';
 chrome.runtime.onStartup.addListener(() => chrome.storage.local.clear());
 
 chrome.tabs.onRemoved.addListener(tabId => {
@@ -22,7 +22,7 @@ chrome.tabs.onRemoved.addListener(tabId => {
         const keys = [tabId, /*thinkTimeKey(tabId),*/ recordKey(tabId)];
         for (let key of keys) {
             if (data.hasOwnProperty(key)) {
-                chrome.storage.local.remove(key);
+                chrome.storage.local.remove(key.toString());
             }
         }
     });

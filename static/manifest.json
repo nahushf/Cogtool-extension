@@ -19,7 +19,7 @@
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
-            "js": ["js/contentScriptEntry.js"],
+            "js": ["js/contentScript.js"],
             "match_about_blank": true,
             "all_frames": true,
             "exclude_matches": [
@@ -41,7 +41,7 @@
     ],
     "web_accessible_resources": [
         {
-            "resources":[ "js/*", "js/contentScriptMain.js"],
+            "resources":[ "js/*", "js/contentScript.js"],
             "matches": ["<all_urls>"]
         }
     ]

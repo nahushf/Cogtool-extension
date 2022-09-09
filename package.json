@@ -1,0 +1,67 @@
+{
+    "name": "cogtool-extension",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "watch": "parcel watch; npm stop",
+        "build": "rm -rf dist; parcel build"
+    },
+    "source": [
+        "popup.html",
+        "options.html",
+        "scripts/background.ts",
+        "scripts/contentScript.ts"
+    ],
+    "parcel-namer-custom": {
+        "background.ts$": "js/[name].[type]",
+        "contentScript.ts$": "js/[name].[type]",
+        ".js$": "js/[name].[hash].[type]",
+        ".ts$": "js/[name].[hash].[type]",
+        ".css$": "js/[name].[hash].[type]"
+    },
+    "prettier": {
+        "arrowParens": "always",
+        "bracketSpacing": true,
+        "disableLanguages": [
+            "vue"
+        ],
+        "endOfLine": "auto",
+        "eslintIntegration": false,
+        "htmlWhitespaceSensitivity": "css",
+        "ignorePath": ".prettierignore",
+        "jsxBracketSameLine": false,
+        "jsxSingleQuote": false,
+        "printWidth": 120,
+        "proseWrap": "preserve",
+        "requireConfig": false,
+        "semi": true,
+        "singleQuote": true,
+        "stylelintIntegration": false,
+        "tabWidth": 4,
+        "trailingComma": "none",
+        "tslintIntegration": true,
+        "useTabs": false
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/nahushf/Cogtool-extension.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/nahushf/Cogtool-extension/issues"
+    },
+    "homepage": "https://github.com/nahushf/Cogtool-extension#readme",
+    "dependencies": {
+        "@types/chrome": "^0.0.195",
+        "@typescript-eslint/parser": "^5.36.1",
+        "parcel": "^2.7.0"
+    },
+    "devDependencies": {
+        "@parcel/validator-typescript": "^2.7.0",
+        "parcel-namer-custom": "^0.2.0",
+        "parcel-reporter-static-files-copy": "^1.4.0"
+    }
+}

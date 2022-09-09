@@ -1,34 +1,35 @@
-import { FITTS_CONSTANT, EVENT_TYPES } from './constants.js';
-import { getGlobalState, constantsKey, roundTo } from './utils.js';
+import { FITTS_CONSTANT, EVENT_TYPES } from './constants';
+import { getGlobalState, constantsKey, roundTo } from './utils';
 
 const svgns = 'http://www.w3.org/2000/svg';
 var ex = document.getElementById('experiment'),
     sp = document.getElementById('scatterplot');
 const instructionsNode = document.getElementById('instructions');
-const aStateNode = document.getElementById('a-state');
-const bStateNode = document.getElementById('b-state');
+const aStateNode = document.getElementById('a-state') as HTMLInputElement;
+const bStateNode = document.getElementById('b-state') as HTMLInputElement;
 const aCurrentValueNode = document.getElementById('a-current-value');
 const bCurrentValueNode = document.getElementById('b-current-value');
 const aNewValueNode = document.getElementById('a-new-value');
 const bNewValueNode = document.getElementById('b-new-value');
-const updateButton = document.getElementById('update-values');
+const updateButton = document.getElementById('update-values') as HTMLButtonElement;
 
 aStateNode.addEventListener('change', function(e) {
-    const a = parseFloat(e.target.value);
+    const a = parseFloat(( e.target as HTMLInputElement ).value);
     setNodeHTML(aNewValueNode, a);
 });
 
 bStateNode.addEventListener('change', function(e) {
-    const b = parseFloat(e.target.value);
+    const b = parseFloat(( e.target as HTMLInputElement).value);
     setNodeHTML(bNewValueNode, b);
 });
 
 function resizeSVGs() {
-    const side = Math.max(Math.min(window.innerWidth / 2, window.innerHeight), 400);
-    ex.setAttribute('width', side);
-    ex.setAttribute('height', side);
-    sp.setAttribute('width', Math.max(window.innerWidth / 2, 400));
-    sp.setAttribute('height', side - 120);
+    const side = Math.max(Math.min(window.innerWidth / 2, window.innerHeight), 400) ;
+    const sideStr = side.toString()
+    ex.setAttribute('width', sideStr);
+    ex.setAttribute('height', sideStr);
+    sp.setAttribute('width', Math.max(window.innerWidth / 2, 400).toString());
+    sp.setAttribute('height', ( side - 120 ).toString());
     calculate();
 }
 
@@ -111,8 +112,8 @@ function calculate() {
                 '<em>n</em> = ' +
                 n;
 
-            aStateNode.value = a;
-            bStateNode.value = b;
+            aStateNode.value = a.toString();
+            bStateNode.value = b. toString();
             aStateNode.dispatchEvent(new Event('change'));
             bStateNode.dispatchEvent(new Event('change'));
             updateButton.disabled = false;
@@ -134,11 +135,11 @@ function experiment(ex) {
                 let cx = Math.round(w / 2 + dist[j] * Math.cos(((spokes - 1) / spokes) * k * Math.PI));
                 let cy = Math.round(h / 2 + dist[j] * Math.sin(((spokes - 1) / spokes) * k * Math.PI));
                 let circle = document.createElementNS(svgns, 'circle');
-                circle.setAttributeNS(null, 'id', id);
+                circle.setAttributeNS(null, 'id', id.toString());
                 circle.setAttributeNS(null, 'display', 'none');
-                circle.setAttributeNS(null, 'cx', cx);
-                circle.setAttributeNS(null, 'cy', cy);
-                circle.setAttributeNS(null, 'r', radii[i] * (1.0 + 0.2 * Math.random()));
+                circle.setAttributeNS(null, 'cx', cx.toString());
+                circle.setAttributeNS(null, 'cy', cy.toString());
+                circle.setAttributeNS(null, 'r', ( radii[i] * (1.0 + 0.2 * Math.random())).toString());
                 circle.setAttributeNS(null, 'fill', 'rgba(255, 0, 0, 1)');
                 circle.addEventListener('click', e => hit(e));
                 ex.appendChild(circle);
@@ -147,7 +148,7 @@ function experiment(ex) {
         }
     }
     numTrials = id - 1;
-    document.getElementById(1).setAttribute('fill', 'rgba(0, 192, 0, 1)');
+    document.getElementById('1').setAttribute('fill', 'rgba(0, 192, 0, 1)');
     setNodeHTML(instructionsNode, numTrials + ' trials. Keep clicking the dot quickly.');
     document.getElementById(numTrials).setAttribute('display', 'block');
 }
@@ -174,7 +175,7 @@ function hit(evt) {
     yClick = y;
     let id = (parseInt(circle.getAttribute('id')) % numTrials) + 1;
     circle.setAttribute('display', 'none');
-    let next = document.getElementById(id);
+    let next = document.getElementById(id.toString());
     // if (next == null) next = document.getElementById(1);
     next.setAttribute('display', 'block');
     setNodeHTML(instructionsNode, 'Trial ' + id + ' of ' + numTrials + '. Keep clicking the dot quickly.');
@@ -214,20 +215,20 @@ function plot(sp, x, y, lr) {
     // vertical labels and grid lines
     for (let xLine = xMin; xLine <= xMax; xLine += xBy) {
         let xPos = leftPad + (w * (xLine - xMin)) / (xMax - xMin);
-        let data = document.createTextNode(xLine);
+        let data = document.createTextNode(xLine.toString());
         let text = document.createElementNS(svgns, 'text');
-        text.setAttributeNS(null, 'x', xPos);
-        text.setAttributeNS(null, 'y', topPad + h + btmPad);
+        text.setAttributeNS(null, 'x', xPos.toString());
+        text.setAttributeNS(null, 'y', ( topPad + h + btmPad ).toString());
         text.setAttributeNS(null, 'style', textStyle);
         text.setAttributeNS(null, 'text-anchor', 'middle');
         text.appendChild(data);
         sp.appendChild(text);
 
         let line = document.createElementNS(svgns, 'line');
-        line.setAttributeNS(null, 'x1', xPos);
-        line.setAttributeNS(null, 'y1', topPad);
-        line.setAttributeNS(null, 'x2', xPos);
-        line.setAttributeNS(null, 'y2', topPad + h + 4);
+        line.setAttributeNS(null, 'x1', xPos.toString());
+        line.setAttributeNS(null, 'y1', topPad.toString());
+        line.setAttributeNS(null, 'x2', xPos.toString());
+        line.setAttributeNS(null, 'y2', ( topPad + h + 4 ).toString());
         line.setAttributeNS(null, 'style', gridStyle);
         sp.appendChild(line);
     }
@@ -235,33 +236,33 @@ function plot(sp, x, y, lr) {
     for (let yLine = yMin; yLine <= yMax; yLine += yBy) {
         let yPos = topPad + h - (h * (yLine - yMin)) / (yMax - yMin);
 
-        let data = document.createTextNode(yLine);
+        let data = document.createTextNode(yLine.toString());
         let text = document.createElementNS(svgns, 'text');
-        text.setAttributeNS(null, 'x', leftPad - 7);
-        text.setAttributeNS(null, 'y', yPos + 4);
+        text.setAttributeNS(null, 'x', ( leftPad - 7 ).toString());
+        text.setAttributeNS(null, 'y', ( yPos + 4 ).toString());
         text.setAttributeNS(null, 'style', textStyle);
         text.setAttributeNS(null, 'text-anchor', 'end');
         text.appendChild(data);
         sp.appendChild(text);
 
         let line = document.createElementNS(svgns, 'line');
-        line.setAttributeNS(null, 'x1', leftPad - 5);
-        line.setAttributeNS(null, 'y1', yPos);
-        line.setAttributeNS(null, 'x2', leftPad + w);
-        line.setAttributeNS(null, 'y2', yPos);
+        line.setAttributeNS(null, 'x1', ( leftPad - 5 ).toString());
+        line.setAttributeNS(null, 'y1', yPos.toString());
+        line.setAttributeNS(null, 'x2', ( leftPad + w ).toString());
+        line.setAttributeNS(null, 'y2', yPos.toString());
         line.setAttributeNS(null, 'style', gridStyle);
         sp.appendChild(line);
     }
     // points
     for (let i = 0; i < x.length; i++) {
         let circle = document.createElementNS(svgns, 'circle');
-        circle.setAttributeNS(null, 'cx', leftPad + (w * (x[i] - xMin)) / (xMax - xMin));
-        circle.setAttributeNS(null, 'cy', topPad + h - (h * (y[i] - yMin)) / (yMax - yMin));
-        circle.setAttributeNS(null, 'r', 4);
+        circle.setAttributeNS(null, 'cx', ( leftPad + (w * (x[i] - xMin)) / (xMax - xMin) ).toString());
+        circle.setAttributeNS(null, 'cy', ( topPad + h - (h * (y[i] - yMin)) / (yMax - yMin) ).toString());
+        circle.setAttributeNS(null, 'r', '4');
         if (Math.abs(lr.z[i]) < 2.0) circle.setAttributeNS(null, 'style', pointStyle);
         else {
             circle.setAttributeNS(null, 'style', outlierStyle);
-            circle.setAttributeNS(null, 'id', i);
+            circle.setAttributeNS(null, 'id', i.toString());
             circle.addEventListener('click', e => removeOutlier(e));
         }
         sp.appendChild(circle);
@@ -269,10 +270,10 @@ function plot(sp, x, y, lr) {
     // regression line
     if (lr.m != null) {
         let line = document.createElementNS(svgns, 'line');
-        line.setAttributeNS(null, 'x1', leftPad);
-        line.setAttributeNS(null, 'y1', topPad + h - (h * (lr.b + lr.m * xMin - yMin)) / (yMax - yMin));
-        line.setAttributeNS(null, 'x2', leftPad + w);
-        line.setAttributeNS(null, 'y2', topPad + h - (h * (lr.b + lr.m * xMax - yMin)) / (yMax - yMin));
+        line.setAttributeNS(null, 'x1', leftPad.toString());
+        line.setAttributeNS(null, 'y1', ( topPad + h - (h * (lr.b + lr.m * xMin - yMin)) / (yMax - yMin) ).toString());
+        line.setAttributeNS(null, 'x2', ( leftPad + w ).toString());
+        line.setAttributeNS(null, 'y2', ( topPad + h - (h * (lr.b + lr.m * xMax - yMin)) / (yMax - yMin) ).toString());
         line.setAttributeNS(null, 'style', regStyle);
         sp.appendChild(line);
     }
@@ -280,7 +281,7 @@ function plot(sp, x, y, lr) {
 
 // find bounds, positive values only
 function bounds(x) {
-    const b = {};
+    const b = {} as any;
     const max = Math.max(...x);
     const min = Math.min(...x);
     const range = max - min;
@@ -295,14 +296,14 @@ function bounds(x) {
     b.lb = lb;
     b.ub = ub;
     b.by = j;
-    return b;
+    return b as {lb: number; ub: number; by: number};
 }
 
 // linear regression
 function linReg(y, x) {
     const n = y.length;
     if (n < 2) return null;
-    const lr = {};
+    const lr = {} as any;
     let sum_x = 0;
     let sum_y = 0;
     let sum_xy = 0;
@@ -329,5 +330,5 @@ function linReg(y, x) {
     const sse = e.reduce((a, c) => a + c * c, 0);
     const sd = Math.sqrt(sse / (n - 2));
     lr.z = e.map(v => v / sd);
-    return lr;
+    return lr as {m: number, b: number, r: number, z: number};
 }

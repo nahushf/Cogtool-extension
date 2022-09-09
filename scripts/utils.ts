@@ -1,4 +1,4 @@
-import { RECORDING_OFF_STATE, FITTS_CONSTANT, THINK_TIME, HOME_TIME, SYSTEM_RESPONSE_TIME } from './constants.js';
+import { RECORDING_OFF_STATE, FITTS_CONSTANT, THINK_TIME, HOME_TIME, SYSTEM_RESPONSE_TIME } from './constants';
 
 export function recordKey(tabKey) {
     return `${tabKey}-recording`;
@@ -66,6 +66,21 @@ export function sendEventMessage({
     type,
     time,
     ...remainingData
+}: Record<string, number | string | boolean> & {
+
+    eventType: string,
+    scrollTime?: number,
+    classList?: string[],
+    ms: number,
+    x?: number,
+    y?: number,
+    width?: number,
+    height?: number,
+    centerX?: number,
+    centerY?: number,
+    date: string,
+    type?: string,
+    time: string,
 }) {
     chrome.runtime.sendMessage({
         data: {

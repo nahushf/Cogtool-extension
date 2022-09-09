@@ -6,7 +6,7 @@ import {
     SYSTEM_RESPONSE_TIME,
     THINK_RECORD,
     THINK_TIME
-} from './constants.js';
+} from './constants';
 
 export class Record {
     record;
@@ -59,7 +59,7 @@ export class HomeRecord extends Record {
 export class SystemResponseRecord extends Record {
     time = SYSTEM_RESPONSE_TIME;
 
-    constructor(record) {
+    constructor(record = SYSTEM_RESPONSE_RECORD) {
         super(record || SYSTEM_RESPONSE_RECORD);
     }
 
