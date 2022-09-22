@@ -3,9 +3,8 @@ import { marshallRecord, SystemResponseRecord } from './Record';
 import { getGlobalState, getState, setRecordState, getSettings } from './utils';
 
 function handleLogClick(e, renderer, tabKey) {
-    console.log(123123123123123);
     const { target } = e;
-    const containerNode = target.closest('.record-drawer-container');
+    const containerNode = target.closest('.record-drawer-container') as HTMLDivElement;
     const recordDrawerNode = target.closest('.record-drawer');
     const closestAddStepNode = target.closest('.record-drawer__add-step');
     const closestModalNode = target.closest('.add-step-modal');
@@ -28,7 +27,7 @@ function handleLogClick(e, renderer, tabKey) {
     } else if (modalContentClicked) {
         if (target.tagName === 'BUTTON') {
             const targetID = target.getAttribute('id');
-            const addIndex = parseInt(containerNode.getAttribute('data-record-index')) + 1;
+            const addIndex = Array.prototype.indexOf.call(containerNode.parentNode.children, containerNode) + 1;
             getGlobalState({
                 callback(data) {
                     getGlobalState({
@@ -225,7 +224,7 @@ class Renderer {
 
     renderRecord(record, index) {
         const recordInstance = marshallRecord(record);
-        return `<div class="record-drawer-container" data-record-index="${index}">
+        return `<div class="record-drawer-container">
                     <div class="record-drawer">
                         <div class="drawer-toggle" >${recordInstance.renderHeader()}${recordInstance.renderTime()}</div>
                         <div class="drawer-content">${recordInstance.renderJSON()}</div>
