@@ -38,7 +38,10 @@ function handleLogClick(e, renderer, tabKey) {
                             if (targetID === 'add-think-step') {
                                 newRecord = { ...THINK_RECORD, expertTime: settings.thinkTime };
                             } else if (targetID === 'add-response-step') {
-                                newRecord = { ...new SystemResponseRecord().record, expertTime: settings.systemResponseTime };
+                                newRecord = {
+                                    ...new SystemResponseRecord().record,
+                                    expertTime: settings.systemResponseTime
+                                };
                             }
                             const records = data[tabKey];
                             const beforeArr = records.slice(0, addIndex);
@@ -76,7 +79,7 @@ class Renderer {
     recordsPerPage = 20;
     timer;
     container;
-    tabKey
+    tabKey;
     constructor(container: Element, storage: chrome.storage.LocalStorageArea, tabKey: string) {
         this.container = container;
         this.storage = storage;
@@ -86,9 +89,9 @@ class Renderer {
     }
 
     _getRecords(callback) {
-        return this.storage.get(this.tabKey, data => {
+        return this.storage.get(this.tabKey, (data) => {
             const tabData = data[this.tabKey] || [];
-            callback(tabData.map(record => marshallRecord(record)));
+            callback(tabData.map((record) => marshallRecord(record)));
         });
     }
 
@@ -97,7 +100,7 @@ class Renderer {
     }
 
     addRecord(record, addAfterIndex) {
-        this._getRecords(records => {
+        this._getRecords((records) => {
             const beforeArr = records.slice(0, addAfterIndex + 1);
             const afterArr = records.slice(addAfterIndex + 1);
             const newArr = { ...beforeArr, record, ...afterArr };
@@ -113,7 +116,7 @@ class Renderer {
                     return;
                 }
                 let totalTime = 0;
-                records.forEach(record => {
+                records.forEach((record) => {
                     totalTime += record.timeTaken;
                 });
                 callback(totalTime);
@@ -132,7 +135,7 @@ class Renderer {
 
     setup() {
         const self = this;
-        document.querySelector('#logs').addEventListener('click', e => handleLogClick(e, this, this.tabKey));
+        document.querySelector('#logs').addEventListener('click', (e) => handleLogClick(e, this, this.tabKey));
         chrome.action.setBadgeBackgroundColor({ color: '#D2042D' });
         this.addPage();
         this.getTotalTime(function(totalTime) {
@@ -140,7 +143,7 @@ class Renderer {
         });
         this.container.addEventListener('scroll', this.handleContainerScroll.bind(this));
         this.totalTimeStateNode.addEventListener('change', function(e) {
-            const time = parseFloat(( e.target as HTMLInputElement ).value) || 0;
+            const time = parseFloat((e.target as HTMLInputElement).value) || 0;
             self.renderTotalTime(time);
         });
     }
@@ -213,8 +216,7 @@ class Renderer {
 
         const documentFragment = document.createDocumentFragment();
         records.forEach((record, index) => {
-            const recordNode = ( new DOMParser()
-                .parseFromString(this.renderRecord(record, index), 'text/html')
+            const recordNode = (new DOMParser().parseFromString(this.renderRecord(record, index), 'text/html')
                 .firstChild as HTMLDivElement).querySelector('.record-drawer-container');
             documentFragment.append(recordNode);
         });
@@ -244,26 +246,28 @@ class Renderer {
                 </div>
             `
             .split('\n')
-            .map(line => line.trim())
+            .map((line) => line.trim())
             .join('');
     }
 
     getCSV(callback) {
-        this._getRecords(tabData => {
+        this._getRecords((tabData) => {
             if (!tabData.length) {
                 callback('');
             } else {
                 const tuples = [];
 
                 tabData.forEach(({ record }) => {
-                    const missingKeys = Object.keys(record).filter(key => {
+                    const missingKeys = Object.keys(record).filter((key) => {
                         return !this.keyOrder.includes(key);
                     });
                     this.keyOrder = [...this.keyOrder, ...missingKeys];
                 });
                 tabData.forEach(({ record }) => {
                     tuples.push(
-                        this.keyOrder.map(key => `"${typeof record[key] === 'undefined' ? '' : record[key]}"`).join(',')
+                        this.keyOrder
+                            .map((key) => `"${typeof record[key] === 'undefined' ? '' : record[key]}"`)
+                            .join(',')
                     );
                 });
                 callback(this.keyOrder, tuples.join('\n'));
@@ -276,7 +280,7 @@ class Renderer {
     }
 }
 
-chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const tabKey = `${tabs[0].id}`;
 
     const logsContainer = document.querySelector('#logs');
@@ -308,7 +312,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     let exportBtn = document.querySelector('.export-csv') as HTMLButtonElement;
     //    let copyBtn = document.querySelector('.copy-clipboard');
 
-    exportBtn.onclick = e => {
+    exportBtn.onclick = (e) => {
         renderer.getCSV((keyOrder, csv) => {
             if (!csv) {
                 chrome.notifications.create('noCSV' + new Date().getTime(), {
@@ -319,10 +323,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
                 });
                 return;
             }
-            let csvContent = 'data:text/csv;charset=utf-8,' + keyOrder + '\n';
-            csvContent += csv;
+            const csvURL = URL.createObjectURL(new Blob([keyOrder + '\n' + csv], { type: 'text/csv;charset=utf-8;' }));
             chrome.downloads.download({
-                url: encodeURI(csvContent),
+                url: csvURL,
                 filename: 'log.csv'
             });
         });
@@ -341,8 +344,8 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     //        });
     //    };
 
-    recordingCheckbox.addEventListener('change', ({ target  }) => {
-        const {checked} = <HTMLInputElement>target;
+    recordingCheckbox.addEventListener('change', ({ target }) => {
+        const { checked } = <HTMLInputElement>target;
         setRecordState({
             tabKey,
             storage: chrome.storage.local,
@@ -357,7 +360,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
         chrome.runtime.openOptionsPage();
     });
 
-    renderer.getRecordingFlag(recordingFlag => {
+    renderer.getRecordingFlag((recordingFlag) => {
         recordingCheckbox.checked = recordingFlag;
         clearBtn.disabled = recordingFlag;
     });
