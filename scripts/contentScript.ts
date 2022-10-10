@@ -95,7 +95,7 @@ const KEYSTROKE_TAGS = ['INPUT', 'TEXTAREA'];
 
 // document.addEventListener('click', e => {});
 
-document.addEventListener('keyup', (e) => {
+document.addEventListener('keypress', (e) => {
     if (!KEYSTROKE_TAGS.includes(document.activeElement.tagName)) {
         return;
     }
